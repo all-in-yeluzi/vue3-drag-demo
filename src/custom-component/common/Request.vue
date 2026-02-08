@@ -3,7 +3,7 @@
     <el-form>
       <el-form-item label="请求地址">
         <el-input v-model.trim="request.url" @blur="validateURL">
-          <template slot="prepend">HTTPS://</template>
+          <template #prepend>HTTPS://</template>
         </el-input>
       </el-form-item>
       <el-form-item label="请求方法">
@@ -12,7 +12,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="请求参数">
-        <el-select v-model="request.paramType" placeholder="参数类型" @change="onChnage">
+        <el-select v-model="request.paramType" placeholder="参数类型" @change="onChange">
           <el-option v-for="item in dataOptions" :key="item" :label="item" :value="item"> </el-option>
         </el-select>
         <div v-if="request.paramType === 'array'" class="param-container">
@@ -47,49 +47,44 @@
   </el-collapse-item>
 </template>
 
-<script>
+<script setup lang="ts">
+import { useMainStore } from '@/store'
+import { storeToRefs } from 'pinia'
 import { urlRE, getURL } from '@/utils/request'
+import { ElMessage } from 'element-plus'
 
-export default {
-  data() {
-    return {
-      methodOptions: ['GET', 'POST', 'PUT', 'DELETE'],
-      dataOptions: ['object', 'array', 'string'],
-    }
-  },
-  computed: {
-    request() {
-      return this.$store.state.curComponent.request
-    },
-  },
-  methods: {
-    addArrayData() {
-      this.request.data.push('')
-    },
+const store = useMainStore()
+const { curComponent } = storeToRefs(store)
 
-    addData() {
-      this.request.data.push(['', ''])
-    },
+const request = curComponent.value.request
+const methodOptions = ['GET', 'POST', 'PUT', 'DELETE']
+const dataOptions = ['object', 'array', 'string']
 
-    deleteData(index) {
-      this.request.data.splice(index, 1)
-    },
+const addArrayData = () => {
+  request.data.push('')
+}
 
-    onChnage() {
-      if (this.request.paramType === 'array') {
-        this.request.data = ['']
-      } else {
-        this.request.data = [['', '']]
-      }
-    },
+const addData = () => {
+  request.data.push(['', ''])
+}
 
-    validateURL() {
-      const url = this.request.url
-      if ((url && /^\d+$/.test(url)) || !urlRE.test(getURL(url))) {
-        this.$message.error('请输入正确的 URL')
-      }
-    },
-  },
+const deleteData = (index: number) => {
+  request.data.splice(index, 1)
+}
+
+const onChange = () => {
+  if (request.paramType === 'array') {
+    request.data = ['']
+  } else {
+    request.data = [['', '']]
+  }
+}
+
+const validateURL = () => {
+  const url = request.url
+  if ((url && /^\d+$/.test(url)) || !urlRE.test(getURL(url))) {
+    ElMessage.error('请输入正确的 URL')
+  }
 }
 </script>
 

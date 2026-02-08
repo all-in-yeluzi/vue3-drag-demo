@@ -1,21 +1,17 @@
 // 编辑器自定义事件
 const events = {
-  redirect(url) {
+  redirect(url: string) {
     if (url) {
       window.location.href = url
     }
   },
 
-  alert(msg) {
+  alert(msg: string) {
     if (msg) {
       // eslint-disable-next-line no-alert
       alert(msg)
     }
   },
-}
-
-const mixins = {
-  methods: events,
 }
 
 const eventList = [
@@ -33,4 +29,4 @@ const eventList = [
   },
 ]
 
-export { mixins, events, eventList }
+export { events, eventList }

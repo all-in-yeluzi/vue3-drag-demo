@@ -1,55 +1,60 @@
-<script>
+<script lang="ts">
+import { defineComponent, onMounted, onBeforeUnmount } from 'vue'
 import eventBus from '@/utils/eventBus'
 
-export default {
+export default defineComponent({
   props: {
     linkage: {
       type: Object,
-      default: () => {},
+      default: () => ({}),
     },
     element: {
       type: Object,
-      default: () => {},
+      default: () => ({}),
     },
   },
-  created() {
-    if (this.linkage?.data?.length) {
-      eventBus.$on('v-click', this.onClick)
-      eventBus.$on('v-hover', this.onHover)
-    }
-  },
-  mounted() {
-    const { data, duration } = this.linkage || {}
-    if (data?.length) {
-      this.$el.style.transition = `all ${duration}s`
-    }
-  },
-  beforeDestroy() {
-    if (this.linkage?.data?.length) {
-      eventBus.$off('v-click', this.onClick)
-      eventBus.$off('v-hover', this.onHover)
-    }
-  },
-  methods: {
-    changeStyle(data = []) {
+  setup(props) {
+    const changeStyle = (data: any[] = []) => {
       data.forEach((item) => {
-        item.style.forEach((e) => {
+        item.style.forEach((e: any) => {
           if (e.key) {
-            this.element.style[e.key] = e.value
+            props.element.style[e.key] = e.value
           }
         })
       })
-    },
+    }
 
-    onClick(componentId) {
-      const data = this.linkage.data.filter((item) => item.id === componentId && item.event === 'v-click')
-      this.changeStyle(data)
-    },
+    const onClick = (componentId: string) => {
+      const data = props.linkage.data.filter((item: any) => item.id === componentId && item.event === 'v-click')
+      changeStyle(data)
+    }
 
-    onHover(componentId) {
-      const data = this.linkage.data.filter((item) => item.id === componentId && item.event === 'v-hover')
-      this.changeStyle(data)
-    },
+    const onHover = (componentId: string) => {
+      const data = props.linkage.data.filter((item: any) => item.id === componentId && item.event === 'v-hover')
+      changeStyle(data)
+    }
+
+    onMounted(() => {
+      if (props.linkage?.data?.length) {
+        eventBus.on('v-click', onClick)
+        eventBus.on('v-hover', onHover)
+      }
+
+      const { data, duration } = props.linkage || {}
+      if (data?.length) {
+        const el = document.querySelector(`#component${props.element.id}`) as HTMLElement
+        if (el) {
+          el.style.transition = `all ${duration}s`
+        }
+      }
+    })
+
+    onBeforeUnmount(() => {
+      if (props.linkage?.data?.length) {
+        eventBus.off('v-click', onClick)
+        eventBus.off('v-hover', onHover)
+      }
+    })
   },
-}
+})
 </script>

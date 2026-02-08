@@ -9,15 +9,11 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import CommonAttr from '@/custom-component/common/CommonAttr.vue'
+import { useMainStore } from '@/store'
+import { storeToRefs } from 'pinia'
 
-export default {
-  components: { CommonAttr },
-  computed: {
-    curComponent() {
-      return this.$store.state.curComponent
-    },
-  },
-}
+const store = useMainStore()
+const { curComponent } = storeToRefs(store)
 </script>

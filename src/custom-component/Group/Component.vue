@@ -10,28 +10,24 @@
         :style="item.groupStyle"
         :prop-value="item.propValue"
         :element="item"
-        :request="item.request"
       />
     </div>
   </div>
 </template>
 
-<script>
-import OnEvent from '../common/OnEvent'
+<script setup lang="ts">
+import { defineProps } from 'vue'
 
-export default {
-  extends: OnEvent,
-  props: {
-    propValue: {
-      type: Array,
-      default: () => [],
-    },
-    element: {
-      type: Object,
-      default: () => {},
-    },
+defineProps({
+  propValue: {
+    type: Array as any,
+    default: () => [],
   },
-}
+  element: {
+    type: Object,
+    default: () => ({}),
+  },
+})
 </script>
 
 <style lang="scss" scoped>

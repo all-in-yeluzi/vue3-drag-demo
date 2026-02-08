@@ -1,13 +1,12 @@
-<!-- eslint-disable vue/no-v-html -->
 <template>
   <div v-if="editMode == 'edit'" class="v-text" @keydown="handleKeydown" @keyup="handleKeyup">
-    <!-- tabindex >= 0 使得双击时聚焦该元素 -->
+    <!-- tabindex >= 0 使得 div 可以 focus，并且绑定键盘事件 -->
     <div
       ref="text"
       :contenteditable="canEdit"
-      :class="{ 'can-edit': canEdit }"
-      tabindex="0"
-      :style="{ verticalAlign: element.style.verticalAlign, padding: element.style.padding + 'px' }"
+      :class="{ canEdit }"
+      :tabindex="element.id"
+      :style="{ verticalAlign: element.style.verticalAlign }"
       @dblclick="setEdit"
       @paste="clearStyle"
       @mousedown="handleMousedown"
@@ -17,148 +16,124 @@
     ></div>
   </div>
   <div v-else class="v-text preview">
-    <div
-      :style="{ verticalAlign: element.style.verticalAlign, padding: element.style.padding + 'px' }"
-      v-html="element.propValue"
-    ></div>
+    <div :style="{ verticalAlign: element.style.verticalAlign }" v-html="element.propValue"></div>
   </div>
 </template>
 
-<script>
-import { mapState } from 'vuex'
-import { keycodes } from '@/utils/shortcutKey.js'
-import request from '@/utils/request'
-import OnEvent from '../common/OnEvent'
+<script setup lang="ts">
+import { ref, onMounted, nextTick } from 'vue'
+import { useMainStore } from '@/store'
+import { storeToRefs } from 'pinia'
+import { keycodes } from '@/utils/shortcutKey'
 import eventBus from '@/utils/eventBus'
+import OnEvent from '../common/OnEvent.vue'
 
-export default {
-  extends: OnEvent,
-  props: {
-    propValue: {
-      type: String,
-      required: true,
-      default: '',
-    },
-    request: {
-      type: Object,
-      default: () => {},
-    },
-    element: {
-      type: Object,
-      default: () => {},
-    },
-    linkage: {
-      type: Object,
-      default: () => {},
-    },
+const props = defineProps({
+  propValue: {
+    type: String,
+    default: '',
   },
-  data() {
-    return {
-      canEdit: false,
-      ctrlKey: 17,
-      isCtrlDown: false,
-      cancelRequest: null,
+  element: {
+    type: Object,
+    default: () => ({}),
+  },
+})
+
+const emit = defineEmits(['input'])
+
+const store = useMainStore()
+const { editMode } = storeToRefs(store)
+
+const canEdit = ref(false)
+const ctrlKey = 17
+const isCtrlDown = ref(false)
+const text = ref<HTMLElement | null>(null)
+
+const setEdit = () => {
+  if (props.element.isLock) return
+  canEdit.value = true
+  nextTick(() => {
+    const el = text.value as HTMLElement
+    if (el) {
+      el.focus()
+      selectText(el)
     }
-  },
-  computed: {
-    ...mapState(['editMode', 'curComponent']),
-  },
-  created() {
-    // 注意，修改时接口属性时不会发数据，在预览时才会发
-    // 如果要在修改接口属性的同时发请求，需要 watch 一下 request 的属性
-    if (this.request) {
-      // 第二个参数是要修改数据的父对象，第三个参数是修改数据的 key，第四个数据修改数据的类型
-      this.cancelRequest = request(this.request, this.element, 'propValue', 'string')
-    }
-
-    eventBus.$on('componentClick', this.onComponentClick)
-  },
-  beforeDestroy() {
-    // 组件销毁时取消请求
-    this.request && this.cancelRequest()
-    eventBus.$off('componentClick', this.onComponentClick)
-  },
-  methods: {
-    onComponentClick() {
-      // 如果当前点击的组件 id 和 VText 不是同一个，需要设为不允许编辑 https://github.com/woai3c/visual-drag-demo/issues/90
-      if (this.curComponent.id !== this.element.id) {
-        this.canEdit = false
-      }
-    },
-
-    handleInput(e) {
-      this.$emit('input', this.element, e.target.innerHTML)
-    },
-
-    handleKeydown(e) {
-      // 阻止冒泡，防止触发复制、粘贴组件操作
-      this.canEdit && e.stopPropagation()
-      if (e.keyCode == this.ctrlKey) {
-        this.isCtrlDown = true
-      } else if (this.isCtrlDown && this.canEdit && keycodes.includes(e.keyCode)) {
-        e.stopPropagation()
-      } else if (e.keyCode == 46) {
-        // deleteKey
-        e.stopPropagation()
-      }
-    },
-
-    handleKeyup(e) {
-      // 阻止冒泡，防止触发复制、粘贴组件操作
-      this.canEdit && e.stopPropagation()
-      if (e.keyCode == this.ctrlKey) {
-        this.isCtrlDown = false
-      }
-    },
-
-    handleMousedown(e) {
-      if (this.canEdit) {
-        e.stopPropagation()
-      }
-    },
-
-    clearStyle(e) {
-      e.preventDefault()
-      const clp = e.clipboardData
-      const text = clp.getData('text/plain') || ''
-      if (text !== '') {
-        document.execCommand('insertText', false, text)
-      }
-
-      this.$emit('input', this.element, e.target.innerHTML)
-    },
-
-    handleBlur(e) {
-      this.element.propValue = e.target.innerHTML || '&nbsp;'
-      const html = e.target.innerHTML
-      if (html !== '') {
-        this.element.propValue = e.target.innerHTML
-      } else {
-        this.element.propValue = ''
-        this.$nextTick(() => {
-          this.element.propValue = '&nbsp;'
-        })
-      }
-      this.canEdit = false
-    },
-
-    setEdit() {
-      if (this.element.isLock) return
-
-      this.canEdit = true
-      // 全选
-      this.selectText(this.$refs.text)
-    },
-
-    selectText(element) {
-      const selection = window.getSelection()
-      const range = document.createRange()
-      range.selectNodeContents(element)
-      selection.removeAllRanges()
-      selection.addRange(range)
-    },
-  },
+  })
 }
+
+const selectText = (element: HTMLElement) => {
+  const selection = window.getSelection()
+  const range = document.createRange()
+  range.selectNodeContents(element)
+  selection?.removeAllRanges()
+  selection?.addRange(range)
+}
+
+const handleInput = (e: any) => {
+  emit('input', props.element, e.target.innerHTML)
+}
+
+const handleKeydown = (e: any) => {
+  if (e.keyCode == ctrlKey) {
+    isCtrlDown.value = true
+  } else if (isCtrlDown.value && canEdit.value && keycodes.includes(e.keyCode)) {
+    e.stopPropagation()
+  } else if (e.keyCode == 46) {
+    // deleteKey
+    e.stopPropagation()
+  }
+}
+
+const handleKeyup = (e: any) => {
+  if (e.keyCode == ctrlKey) {
+    isCtrlDown.value = false
+  }
+}
+
+const handleMousedown = (e: any) => {
+  if (canEdit.value) {
+    e.stopPropagation()
+  }
+}
+
+const clearStyle = (e: any) => {
+  e.preventDefault()
+  const clp = e.clipboardData
+  const text = clp.getData('text/plain') || ''
+  if (text !== '') {
+    document.execCommand('insertText', false, text)
+  }
+
+  emit('input', props.element, e.target.innerHTML)
+}
+
+const handleBlur = (e: any) => {
+  const target = e?.target as HTMLElement | null
+  if (!target) {
+    canEdit.value = false
+    return
+  }
+  props.element.propValue = target.innerHTML || '&nbsp;'
+  const html = target.innerHTML
+  if (html !== '') {
+    props.element.propValue = target.innerHTML
+  } else {
+    props.element.propValue = ''
+    nextTick(() => {
+      props.element.propValue = '&nbsp;'
+    })
+  }
+  canEdit.value = false
+}
+
+onMounted(() => {
+  eventBus.on('componentClick', (id) => {
+    // 点击画布时不取消组件编辑状态，点击其他组件时取消当前组件编辑状态
+    if (id !== props.element.id) {
+      handleBlur({ target: text.value })
+    }
+  })
+})
 </script>
 
 <style lang="scss" scoped>
@@ -176,7 +151,7 @@ export default {
     padding: 4px;
   }
 
-  .can-edit {
+  .canEdit {
     cursor: text;
     height: 100%;
   }

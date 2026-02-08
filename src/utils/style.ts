@@ -1,7 +1,7 @@
 import { sin, cos, toPercent } from '@/utils/translate'
 
-export function getShapeStyle(style) {
-  const result = {}
+export function getShapeStyle(style: any) {
+  const result: any = {}
   ;['width', 'height', 'top', 'left', 'rotate'].forEach((attr) => {
     if (attr != 'rotate') {
       result[attr] = `${style[attr]}px`
@@ -15,8 +15,8 @@ export function getShapeStyle(style) {
 
 const needUnit = ['fontSize', 'width', 'height', 'top', 'left', 'borderWidth', 'letterSpacing', 'borderRadius']
 
-export function getSVGStyle(style, filter = []) {
-  const result = {}
+export function getSVGStyle(style: any, filter: string[] = []) {
+  const result: any = {}
 
   ;[
     'opacity',
@@ -50,8 +50,8 @@ export function getSVGStyle(style, filter = []) {
   return result
 }
 
-export function getStyle(style, filter = []) {
-  const result = {}
+export function getStyle(style: any, filter: string[] = []) {
+  const result: any = {}
   Object.keys(style).forEach((key) => {
     if (!filter.includes(key)) {
       if (key != 'rotate') {
@@ -72,7 +72,7 @@ export function getStyle(style, filter = []) {
 }
 
 // 获取一个组件旋转 rotate 后的样式
-export function getComponentRotatedStyle(style) {
+export function getComponentRotatedStyle(style: any) {
   style = { ...style }
   if (style.rotate != 0) {
     const newWidth = style.width * cos(style.rotate) + style.height * sin(style.rotate)
@@ -96,8 +96,8 @@ export function getComponentRotatedStyle(style) {
 }
 
 const filterKeys = ['width', 'height', 'scale']
-export function getCanvasStyle(canvasStyleData) {
-  const result = {}
+export function getCanvasStyle(canvasStyleData: any) {
+  const result: any = {}
   Object.keys(canvasStyleData)
     .filter((key) => !filterKeys.includes(key))
     .forEach((key) => {
@@ -110,9 +110,9 @@ export function getCanvasStyle(canvasStyleData) {
   return result
 }
 
-export function createGroupStyle(groupComponent) {
+export function createGroupStyle(groupComponent: any) {
   const parentStyle = groupComponent.style
-  groupComponent.propValue.forEach((component) => {
+  groupComponent.propValue.forEach((component: any) => {
     // component.groupStyle 的 top left 是相对于 group 组件的位置
     // 如果已存在 component.groupStyle，说明已经计算过一次了。不需要再次计算
     if (!Object.keys(component.groupStyle).length) {

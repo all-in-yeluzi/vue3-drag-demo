@@ -1,3 +1,5 @@
+import titleImg from '@/assets/title.jpg'
+
 // 公共样式
 export const commonStyle = {
   rotate: 0,
@@ -9,7 +11,7 @@ export const commonAttr = {
   events: {},
   groupStyle: {}, // 当一个组件成为 Group 的子组件时使用
   isLock: false, // 是否锁定组件
-  collapseName: 'style', // 编辑组件时记录当前使用的是哪个折叠面板，再次回来时恢复上次打开的折叠面板，优化用户体验
+  collapseName: 'style', // 编辑组件时记录当前位移
   linkage: {
     duration: 0, // 过渡持续时间
     data: [
@@ -18,7 +20,7 @@ export const commonAttr = {
         id: '', // 联动的组件 id
         label: '', // 联动的组件名称
         event: '', // 监听事件
-        style: [{ key: '', value: '' }], // 监听的事件触发时，需要改变的属性
+        style: [{ key: '', value: '' }], // 监听的事件触发时，当前组件的改变
       },
     ],
   },
@@ -44,12 +46,11 @@ const list = [
       width: 200,
       height: 28,
       fontSize: 14,
-      fontWeight: 400,
+      fontWeight: 500,
       lineHeight: '',
       letterSpacing: 0,
       textAlign: '',
       color: '',
-      padding: 4,
     },
   },
   {
@@ -63,7 +64,7 @@ const list = [
       borderWidth: 1,
       borderColor: '',
       borderRadius: '',
-      fontSize: 14,
+      fontSize: '',
       fontWeight: 400,
       lineHeight: '',
       letterSpacing: 0,
@@ -77,7 +78,7 @@ const list = [
     label: '图片',
     icon: 'tupian',
     propValue: {
-      url: require('@/assets/title.jpg'),
+      url: titleImg,
       flip: {
         horizontal: false,
         vertical: false,
@@ -98,7 +99,7 @@ const list = [
       width: 200,
       height: 200,
       fontSize: 14,
-      fontWeight: 400,
+      fontWeight: 500,
       lineHeight: '',
       letterSpacing: 0,
       textAlign: 'center',
@@ -131,7 +132,7 @@ const list = [
       width: 200,
       height: 200,
       fontSize: 14,
-      fontWeight: 400,
+      fontWeight: 500,
       lineHeight: '',
       letterSpacing: 0,
       textAlign: 'center',
@@ -153,12 +154,13 @@ const list = [
       width: 80,
       height: 80,
       fontSize: 14,
-      fontWeight: 400,
+      fontWeight: 500,
       lineHeight: '',
       letterSpacing: 0,
       textAlign: 'center',
       color: '',
       borderColor: '#000',
+      borderWidth: 1,
       backgroundColor: 'rgba(255, 255, 255, 1)',
     },
   },
@@ -171,12 +173,13 @@ const list = [
       width: 80,
       height: 80,
       fontSize: 14,
-      fontWeight: 400,
+      fontWeight: 500,
       lineHeight: '',
       letterSpacing: 0,
       textAlign: 'center',
       color: '',
       borderColor: '#000',
+      borderWidth: 1,
       backgroundColor: 'rgba(255, 255, 255, 1)',
     },
   },
@@ -205,7 +208,7 @@ const list = [
       width: 600,
       height: 200,
       fontSize: 14,
-      fontWeight: 400,
+      fontWeight: 500,
       textAlign: 'center',
       color: '',
       backgroundColor: 'rgba(255, 255, 255, 1)',

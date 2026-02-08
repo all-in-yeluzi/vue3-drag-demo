@@ -4,23 +4,20 @@
   </div>
 </template>
 
-<script>
-import OnEvent from '../common/OnEvent'
+<script setup lang="ts">
+import OnEvent from '../common/OnEvent.vue'
 
-export default {
-  extends: OnEvent,
-  props: {
-    propValue: {
-      type: String,
-      required: true,
-      default: '',
-    },
-    element: {
-      type: Object,
-      default: () => {},
-    },
+defineProps({
+  propValue: {
+    type: String,
+    required: true,
+    default: '',
   },
-}
+  element: {
+    type: Object,
+    default: () => ({}),
+  },
+})
 </script>
 
 <style lang="scss" scoped>

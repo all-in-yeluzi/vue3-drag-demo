@@ -17,54 +17,53 @@
   </div>
 </template>
 
-<script>
-import { getStyle, getCanvasStyle } from '@/utils/style'
-import { mapState } from 'vuex'
-import ComponentWrapper from './ComponentWrapper'
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useMainStore } from '@/store'
+import { storeToRefs } from 'pinia'
+import { getCanvasStyle } from '@/utils/style'
+import ComponentWrapper from './ComponentWrapper.vue'
 import { changeStyleWithScale } from '@/utils/translate'
 import { toPng } from 'html-to-image'
 import { deepCopy } from '@/utils/utils'
 
-export default {
-  components: { ComponentWrapper },
-  props: {
-    isScreenshot: {
-      type: Boolean,
-      default: false,
-    },
+defineProps({
+  isScreenshot: {
+    type: Boolean,
+    default: false,
   },
-  data() {
-    return {
-      copyData: [],
-    }
-  },
-  computed: mapState(['componentData', 'canvasStyleData']),
-  created() {
-    this.$set(this, 'copyData', deepCopy(this.componentData))
-  },
-  methods: {
-    getStyle,
-    getCanvasStyle,
-    changeStyleWithScale,
+})
 
-    close() {
-      this.$emit('close')
-    },
+const emit = defineEmits(['close'])
 
-    htmlToImage() {
-      toPng(this.$refs.container.querySelector('.canvas'))
-        .then((dataUrl) => {
-          const a = document.createElement('a')
-          a.setAttribute('download', 'screenshot')
-          a.href = dataUrl
-          a.click()
-        })
-        .catch((error) => {
-          console.error('oops, something went wrong!', error)
-        })
-        .finally(this.close)
-    },
-  },
+const store = useMainStore()
+const { componentData, canvasStyleData } = storeToRefs(store)
+
+const copyData = ref<any[]>([])
+const container = ref<HTMLElement | null>(null)
+
+onMounted(() => {
+  copyData.value = deepCopy(componentData.value)
+})
+
+const close = () => {
+  emit('close')
+}
+
+const htmlToImage = () => {
+  if (container.value) {
+    toPng(container.value.querySelector('.canvas') as HTMLElement)
+      .then((dataUrl) => {
+        const a = document.createElement('a')
+        a.setAttribute('download', 'screenshot')
+        a.href = dataUrl
+        a.click()
+      })
+      .catch((error) => {
+        console.error('oops, something went wrong!', error)
+      })
+      .finally(close)
+  }
 }
 </script>
 

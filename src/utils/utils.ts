@@ -1,8 +1,6 @@
-import Vue from 'vue'
-
-export function deepCopy(target) {
+export function deepCopy(target: any): any {
   if (typeof target == 'object') {
-    const result = Array.isArray(target) ? [] : {}
+    const result: any = Array.isArray(target) ? [] : {}
     for (const key in target) {
       if (typeof target[key] == 'object') {
         result[key] = deepCopy(target[key])
@@ -17,17 +15,17 @@ export function deepCopy(target) {
   return target
 }
 
-export function swap(arr, i, j) {
+export function swap(arr: any[], i: number, j: number) {
   const temp = arr[i]
-  Vue.set(arr, i, arr[j])
-  Vue.set(arr, j, temp)
+  arr[i] = arr[j]
+  arr[j] = temp
 }
 
-export function $(selector) {
-  return document.querySelector(selector)
+export function $(selector: string): HTMLElement {
+  return document.querySelector(selector) as HTMLElement
 }
 
 const components = ['VText', 'RectShape', 'CircleShape']
-export function isPreventDrop(component) {
+export function isPreventDrop(component: string) {
   return !components.includes(component) && !component.startsWith('SVG')
 }

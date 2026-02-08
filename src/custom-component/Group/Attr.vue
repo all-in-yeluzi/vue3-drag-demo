@@ -4,10 +4,6 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import CommonAttr from '@/custom-component/common/CommonAttr.vue'
-
-export default {
-  components: { CommonAttr },
-}
 </script>

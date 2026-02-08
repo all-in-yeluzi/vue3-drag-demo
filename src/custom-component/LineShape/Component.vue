@@ -2,12 +2,20 @@
   <div class="line-shape"></div>
 </template>
 
-<script>
-import OnEvent from '../common/OnEvent'
+<script setup lang="ts">
+import OnEvent from '../common/OnEvent.vue'
 
-export default {
-  extends: OnEvent,
-}
+defineProps({
+  propValue: {
+    type: String,
+    required: true,
+    default: '',
+  },
+  element: {
+    type: Object,
+    default: () => ({}),
+  },
+})
 </script>
 
 <style lang="scss" scoped>

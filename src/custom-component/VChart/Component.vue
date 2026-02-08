@@ -1,47 +1,69 @@
 <template>
-  <v-chart ref="chart" class="chart" :option="propValue.option" autoresize />
+  <div style="min-height: 300px; min-width: 300px">
+    <v-chart
+      ref="vChartRef"
+      class="chart"
+      :option="option"
+      autoresize
+    />
+  </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref, watch, onMounted } from 'vue'
+import VChart from 'vue-echarts'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import { ScatterChart, BarChart, LineChart } from 'echarts/charts'
-import OnEvent from '../common/OnEvent'
-import { TitleComponent, TooltipComponent, LegendComponent, GridComponent } from 'echarts/components'
-import VChart from 'vue-echarts'
+import { BarChart, LineChart, PieChart, ScatterChart } from 'echarts/charts'
+import {
+  GridComponent,
+  TooltipComponent,
+  LegendComponent,
+  TitleComponent,
+  DataZoomComponent,
+} from 'echarts/components'
+import OnEvent from '../common/OnEvent.vue'
 
 use([
   CanvasRenderer,
-  ScatterChart,
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent,
-  GridComponent,
   BarChart,
   LineChart,
+  PieChart,
+  ScatterChart,
+  GridComponent,
+  TooltipComponent,
+  LegendComponent,
+  TitleComponent,
+  DataZoomComponent,
 ])
 
-export default {
-  components: {
-    VChart,
+const props = defineProps({
+  propValue: {
+    type: Object,
+    required: true,
+    default: () => ({}),
   },
-  extends: OnEvent,
-  props: {
-    propValue: {
-      type: Object,
-      require: true,
-      default: () => {},
-    },
-    element: {
-      type: Object,
-      default: () => {},
-    },
+  element: {
+    type: Object,
+    default: () => ({}),
   },
-}
+})
+
+const vChartRef = ref<any>(null)
+let option = ref(props.propValue.option)
+
+watch(
+  () => props.propValue.option,
+  (newValue) => {
+    option.value = newValue
+  },
+  { deep: true },
+)
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .chart {
-  height: 400px;
+  width: 100%;
+  height: 100%;
 }
 </style>

@@ -23,44 +23,45 @@
       :request="config.request"
       :linkage="config.linkage"
     />
+    <OnEvent :linkage="config.linkage" :element="config" />
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import { getStyle, getSVGStyle } from '@/utils/style'
 import runAnimation from '@/utils/runAnimation'
-import { mixins } from '@/utils/events'
+import { events } from '@/utils/events'
 import eventBus from '@/utils/eventBus'
+import OnEvent from '@/custom-component/common/OnEvent.vue'
 
-export default {
-  mixins: [mixins],
-  props: {
-    config: {
-      type: Object,
-      required: true,
-      default: () => {},
-    },
+const props = defineProps({
+  config: {
+    type: Object,
+    required: true,
+    default: () => ({}),
   },
-  mounted() {
-    runAnimation(this.$refs.component.$el, this.config.animations)
-  },
-  methods: {
-    getStyle,
-    getSVGStyle,
+})
 
-    onClick() {
-      const events = this.config.events
-      Object.keys(events).forEach((event) => {
-        this[event](events[event])
-      })
+const component = ref<any>(null)
 
-      eventBus.$emit('v-click', this.config.id)
-    },
+onMounted(() => {
+  if (component.value) {
+    runAnimation(component.value.$el, props.config.animations)
+  }
+})
 
-    onMouseEnter() {
-      eventBus.$emit('v-hover', this.config.id)
-    },
-  },
+const onClick = () => {
+  const eventMap = props.config.events
+  Object.keys(eventMap).forEach((event) => {
+    ;(events as any)[event](eventMap[event])
+  })
+
+  eventBus.emit('v-click', props.config.id)
+}
+
+const onMouseEnter = () => {
+  eventBus.emit('v-hover', props.config.id)
 }
 </script>
 

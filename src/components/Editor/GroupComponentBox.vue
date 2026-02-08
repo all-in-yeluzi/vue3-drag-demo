@@ -10,27 +10,25 @@
   ></div>
 </template>
 
-<script>
-export default {
-  props: {
-    width: {
-      type: Number,
-      default: 0,
-    },
-    height: {
-      type: Number,
-      default: 0,
-    },
-    left: {
-      type: Number,
-      default: 0,
-    },
-    top: {
-      type: Number,
-      default: 0,
-    },
+<script setup lang="ts">
+defineProps({
+  width: {
+    type: Number,
+    default: 0,
   },
-}
+  height: {
+    type: Number,
+    default: 0,
+  },
+  left: {
+    type: Number,
+    default: 0,
+  },
+  top: {
+    type: Number,
+    default: 0,
+  },
+})
 </script>
 
 <style lang="scss" scoped>

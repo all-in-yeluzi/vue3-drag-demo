@@ -23,12 +23,10 @@
   </svg>
 </template>
 
-<script>
-export default {
-  props: {
-    isDarkMode: Boolean,
-  },
-}
+<script setup lang="ts">
+defineProps({
+  isDarkMode: Boolean,
+})
 </script>
 
 <style lang="scss" scoped>

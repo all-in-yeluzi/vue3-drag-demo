@@ -1,8 +1,8 @@
-import { Message } from 'element-ui'
+import { ElMessage } from 'element-plus'
 
 export const urlRE = /(https?):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/
 
-function request(options) {
+function request(options: any) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest()
     xhr.timeout = 6000
@@ -16,7 +16,7 @@ function request(options) {
 
     xhr.ontimeout = reject
     xhr.onerror = reject
-    xhr.onload = (e) => {
+    xhr.onload = (e: any) => {
       resolve(e.target.response)
     }
 
@@ -24,7 +24,7 @@ function request(options) {
   })
 }
 
-function getURLParam(data) {
+function getURLParam(data: any[]) {
   let result = ''
   data.forEach((item) => {
     if (item[0]) {
@@ -35,14 +35,14 @@ function getURLParam(data) {
   return result ? `?${result}` : ''
 }
 
-function getURLData(data, paramType) {
+function getURLData(data: any[], paramType: string) {
   if (!data) return ''
 
   if (paramType === 'array') {
     return data
   }
 
-  const result = {}
+  const result: any = {}
   data.forEach((item) => {
     if (item[0]) {
       result[item[0]] = item[1]
@@ -52,7 +52,7 @@ function getURLData(data, paramType) {
   return result
 }
 
-export function getURL(url) {
+export function getURL(url: string) {
   return url.startsWith('http') ? url : `https://${url}`
 }
 
@@ -64,21 +64,26 @@ export function getURL(url) {
  * @param {string} responseType 需要修改的数据对应的类型
  * @returns {function} 可以取消请求的函数
  */
-export default function requestWarpper(options, obj, key, responseType = 'object') {
+export default function requestWarpper(
+  options: any,
+  obj: any,
+  key: string,
+  responseType: string = 'object',
+) {
   let count = 0
-  let timer
+  let timer: any
   const url = options?.url
   if ((url && !/^\d+$/.test(url)) || urlRE.test(getURL(url))) {
     if (!options.series) {
-      request(options, responseType)
-        .then((data) => {
+      request(options)
+        .then((data: any) => {
           if (responseType === 'object' || responseType === 'array') {
             obj[key] = JSON.parse(data)
           } else {
             obj[key] = data
           }
         })
-        .catch((err) => Message.error(err?.message || err))
+        .catch((err: any) => ElMessage.error(err?.message || err))
     } else {
       timer = setInterval(() => {
         if (options.requestCount != 0 && options.requestCount <= count) {
@@ -87,15 +92,15 @@ export default function requestWarpper(options, obj, key, responseType = 'object
         }
 
         count++
-        request(options, responseType)
-          .then((data) => {
+        request(options)
+          .then((data: any) => {
             if (responseType === 'object' || responseType === 'array') {
               obj[key] = JSON.parse(data)
             } else {
               obj[key] = data
             }
           })
-          .catch((err) => Message.error(err?.message || err))
+          .catch((err: any) => ElMessage.error(err?.message || err))
       }, options.time)
     }
   }

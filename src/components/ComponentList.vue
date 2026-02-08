@@ -1,26 +1,27 @@
 <template>
   <div class="component-list" @dragstart="handleDragStart">
-    <div v-for="(item, index) in componentList" :key="index" class="list" draggable :data-index="index">
-      <span v-if="item.icon.substr(0, 2) === 'el'" :class="item.icon"></span>
+    <div v-for="(item, index) in componentList" :key="index" class="list" :draggable="true" :data-index="index">
+      <el-icon v-if="item.icon.startsWith('el')">
+        <component :is="elIconMap[item.icon]" />
+      </el-icon>
       <span v-else class="iconfont" :class="'icon-' + item.icon"></span>
     </div>
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import componentList from '@/custom-component/component-list'
+import { DataAnalysis } from '@element-plus/icons-vue'
 
-export default {
-  data() {
-    return {
-      componentList,
-    }
-  },
-  methods: {
-    handleDragStart(e) {
-      e.dataTransfer.setData('index', e.target.dataset.index)
-    },
-  },
+const elIconMap: Record<string, any> = {
+  'el-icon-data-analysis': DataAnalysis,
+}
+
+const handleDragStart = (e: DragEvent) => {
+  if (!e.dataTransfer) return
+  const targetEl = (e.target as HTMLElement)?.closest('.list') as HTMLElement | null
+  const index = targetEl?.dataset?.index ?? ''
+  e.dataTransfer.setData('index', String(index))
 }
 </script>
 

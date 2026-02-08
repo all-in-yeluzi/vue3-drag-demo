@@ -2,22 +2,20 @@
   <button class="v-button">{{ propValue }}</button>
 </template>
 
-<script>
-import OnEvent from '../common/OnEvent'
+<script setup lang="ts">
+import OnEvent from '../common/OnEvent.vue'
 
-export default {
-  extends: OnEvent,
-  props: {
-    propValue: {
-      type: String,
-      default: '',
-    },
-    element: {
-      type: Object,
-      default: () => {},
-    },
+defineProps({
+  propValue: {
+    type: String,
+    required: true,
+    default: '',
   },
-}
+  element: {
+    type: Object,
+    default: () => ({}),
+  },
+})
 </script>
 
 <style lang="scss" scoped>
@@ -26,9 +24,9 @@ export default {
   line-height: 1;
   white-space: nowrap;
   cursor: pointer;
-  background: var(--main-bg-color);
+  background: #fff;
   border: 1px solid #dcdfe6;
-  color: var(--text-color);
+  color: #606266;
   appearance: none;
   text-align: center;
   box-sizing: border-box;

@@ -24,14 +24,14 @@
             v-model="item.param"
             type="textarea"
             placeholder="请输入完整的 URL"
-            @keydown.native.stop
+            @keydown.stop
           />
           <el-input
             v-if="item.key == 'alert'"
             v-model="item.param"
             type="textarea"
             placeholder="请输入要 alert 的内容"
-            @keydown.native.stop
+            @keydown.stop
           />
           <el-button style="margin-top: 20px" @click="addEvent(item.key, item.param)">确定</el-button>
         </el-tab-pane>
@@ -40,32 +40,26 @@
   </div>
 </template>
 
-<script>
-import { mapState } from 'vuex'
-import Modal from '@/components/Modal'
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useMainStore } from '@/store'
+import { storeToRefs } from 'pinia'
+import Modal from '@/components/Modal.vue'
 import { eventList } from '@/utils/events'
 
-export default {
-  components: { Modal },
-  data() {
-    return {
-      isShowEvent: false,
-      eventURL: '',
-      eventActiveName: 'redirect',
-      eventList,
-    }
-  },
-  computed: mapState(['curComponent']),
-  methods: {
-    addEvent(event, param) {
-      this.isShowEvent = false
-      this.$store.commit('addEvent', { event, param })
-    },
+const store = useMainStore()
+const { curComponent } = storeToRefs(store)
 
-    removeEvent(event) {
-      this.$store.commit('removeEvent', event)
-    },
-  },
+const isShowEvent = ref(false)
+const eventActiveName = ref('redirect')
+
+const addEvent = (event: string, param: any) => {
+  isShowEvent.value = false
+  store.addEvent({ event, param })
+}
+
+const removeEvent = (event: string) => {
+  store.removeEvent(event)
 }
 </script>
 

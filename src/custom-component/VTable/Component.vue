@@ -15,40 +15,20 @@
   </table>
 </template>
 
-<script>
-import request from '@/utils/request'
-import OnEvent from '../common/OnEvent'
+<script setup lang="ts">
+import OnEvent from '../common/OnEvent.vue'
 
-export default {
-  extends: OnEvent,
-  props: {
-    propValue: {
-      type: Object,
-      default: () => {},
-    },
-    request: {
-      type: Object,
-      default: () => {},
-    },
-    element: {
-      type: Object,
-      default: () => {},
-    },
+defineProps({
+  propValue: {
+    type: Object,
+    required: true,
+    default: () => ({}),
   },
-  data() {
-    return {
-      cancelRequest: null,
-    }
+  element: {
+    type: Object,
+    default: () => ({}),
   },
-  created() {
-    if (this.request) {
-      this.cancelRequest = request(this.request, this.propValue, 'data')
-    }
-  },
-  beforeDestroy() {
-    this.request && this.cancelRequest()
-  },
-}
+})
 </script>
 
 <style lang="scss" scoped>
@@ -57,20 +37,20 @@ export default {
   table-layout: fixed;
   word-break: break-all;
   word-wrap: break-word;
+  width: 100%;
+  height: 100%;
 
   td {
-    border: 1px solid #ebeef5;
-    height: 40px;
-    width: 60px;
-    padding: 10px;
-  }
-
-  .bold {
-    font-weight: bold;
+    border: 1px solid #ccc;
+    height: 10px;
   }
 
   .stripe {
     background-color: #fafafa;
+  }
+
+  .bold {
+    font-weight: bold;
   }
 }
 </style>

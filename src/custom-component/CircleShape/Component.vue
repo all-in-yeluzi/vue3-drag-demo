@@ -1,33 +1,28 @@
 <template>
-  <div class="circle-shape">
+  <div class="circle">
     <v-text :prop-value="element.propValue" :element="element" />
   </div>
 </template>
 
-<script>
-import OnEvent from '../common/OnEvent'
+<script setup lang="ts">
+import OnEvent from '../common/OnEvent.vue'
 
-export default {
-  extends: OnEvent,
-  props: {
-    propValue: {
-      type: String,
-      required: true,
-      default: '',
-    },
-    element: {
-      type: Object,
-      default: () => {},
-    },
+defineProps({
+  propValue: {
+    type: String,
+    required: true,
+    default: '',
   },
-}
+  element: {
+    type: Object,
+    default: () => ({}),
+  },
+})
 </script>
 
 <style lang="scss" scoped>
-.circle-shape {
-  width: 100%;
-  height: 100%;
+.circle {
   border-radius: 50%;
-  overflow: auto;
+  overflow: hidden;
 }
 </style>

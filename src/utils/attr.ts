@@ -19,7 +19,7 @@ export const styleData = [
   { key: 'opacity', label: '不透明度' },
 ]
 
-export const styleMap = {
+export const styleMap: any = {
   left: 'x 坐标',
   top: 'y 坐标',
   rotate: '旋转角度',
@@ -83,7 +83,7 @@ export const verticalAlignOptions = [
 
 export const selectKey = ['textAlign', 'borderStyle', 'verticalAlign']
 
-export const optionMap = {
+export const optionMap: any = {
   textAlign: textAlignOptions,
   borderStyle: borderStyleOptions,
   verticalAlign: verticalAlignOptions,
