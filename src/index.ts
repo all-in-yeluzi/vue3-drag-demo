@@ -22,6 +22,7 @@ const createEditorAdapter = () => {
     setData: (data: any[]) => store.setComponentData(data),
     getData: () => store.componentData,
     addComponent: (component: any) => store.addComponent({ component }),
+    setComponentList: (list: any[]) => store.setComponentList(list),
     get store() {
       return store
     },

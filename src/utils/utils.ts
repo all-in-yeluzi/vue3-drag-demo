@@ -1,11 +1,20 @@
-export function deepCopy(target: any): any {
-  if (typeof target == 'object') {
+export function deepCopy(target: any, map = new WeakMap()): any {
+  if (typeof target === 'object' && target !== null) {
+    // 处理循环引用
+    if (map.has(target)) {
+      return map.get(target)
+    }
+
     const result: any = Array.isArray(target) ? [] : {}
+    map.set(target, result)
+
     for (const key in target) {
-      if (typeof target[key] == 'object') {
-        result[key] = deepCopy(target[key])
-      } else {
-        result[key] = target[key]
+      if (Object.prototype.hasOwnProperty.call(target, key)) {
+        if (typeof target[key] === 'object' && target[key] !== null) {
+          result[key] = deepCopy(target[key], map)
+        } else {
+          result[key] = target[key]
+        }
       }
     }
 

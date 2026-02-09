@@ -53,9 +53,13 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import componentList from '@/custom-component/component-list'
+import { useMainStore } from '@/store'
+import { storeToRefs } from 'pinia'
 import RealTimeComponentList from '@/components/RealTimeComponentList.vue'
 import { DataAnalysis, Grid, Star, Menu, PieChart, Collection } from '@element-plus/icons-vue'
+
+const store = useMainStore()
+const { componentList } = storeToRefs(store)
 
 const elIconMap: Record<string, any> = {
   'el-icon-data-analysis': DataAnalysis,
@@ -88,7 +92,7 @@ const subCategoryMap: Record<string, string> = {
 const currentCategory = ref('base')
 
 const currentComponents = computed(() => {
-  const filtered = componentList
+  const filtered = componentList.value
     .map((component, index) => ({ component, index }))
     .filter((item) => item.component.category === currentCategory.value)
 

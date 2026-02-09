@@ -59,6 +59,7 @@
     <Area v-show="isShowArea" :start="start" :width="width" :height="height" />
     <GroupComponentBox v-if="areaData?.components?.length" v-bind="areaData.style" />
   </div>
+  <!-- <el-slider v-model="scale" @change="handleScaleChange" /> -->
 </template>
 
 <script setup lang="ts">
@@ -80,14 +81,14 @@ import GroupComponentBox from './GroupComponentBox.vue'
 import eventBus from '@/utils/eventBus'
 import Grid from './Grid.vue'
 import { changeStyleWithScale } from '@/utils/translate'
-
+import changeComponentsSizeWithScale, { changeComponentSizeWithScale } from '@/utils/changeComponentsSizeWithScale'
 const props = defineProps({
   isEdit: {
     type: Boolean,
     default: true,
   },
 })
-
+const scale = ref(100)
 const store = useMainStore()
 const { componentData, curComponent, canvasStyleData, editor, isDarkMode, areaData } = storeToRefs(store)
 
@@ -234,6 +235,11 @@ const getTextareaHeight = (element: any, text: any) => {
   }
   const newHeight = (text.split('<br>').length - 1) * lineHeight * (fontSize || canvasStyleData.value.fontSize)
   return height > newHeight ? height : newHeight
+}
+const handleScaleChange = () => {
+  store.setLastScale(scale.value)
+  scale.value = ~~scale.value || 1
+    changeComponentsSizeWithScale(scale.value)
 }
 </script>
 <style lang="scss" scoped>

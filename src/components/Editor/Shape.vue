@@ -225,8 +225,8 @@ const handleMouseDownOnShape = (e: any) => {
     hasMove = true
     const curX = moveEvent.clientX
     const curY = moveEvent.clientY
-    pos.top = curY - startY + startTop
-    pos.left = curX - startX + startLeft
+    pos.top = (curY - startY) / (store.canvasStyleData.scale / 100) + startTop
+    pos.left = (curX - startX) / (store.canvasStyleData.scale / 100) + startLeft
 
     store.setShapeStyle(pos)
     nextTick(() => {

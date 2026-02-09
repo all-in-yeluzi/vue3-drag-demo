@@ -110,9 +110,14 @@ const setData = async (data: any) => {
   }
 }
 
+const setComponentList = (list: any[]) => {
+  store.setComponentList(list)
+}
+
 defineExpose({
   getData,
   setData,
+  setComponentList,
 })
 
 onMounted(() => {

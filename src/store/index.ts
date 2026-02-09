@@ -3,7 +3,7 @@ import generateID from '@/utils/generateID'
 import eventBus from '@/utils/eventBus'
 import decomposeComponent from '@/utils/decomposeComponent'
 import { $ } from '@/utils/utils'
-import { commonStyle, commonAttr } from '@/custom-component/component-list'
+import defaultList, { commonStyle, commonAttr } from '@/custom-component/component-list'
 import { createGroupStyle, getComponentRotatedStyle } from '@/utils/style'
 import { deepCopy, swap } from '@/utils/utils'
 import changeComponentsSizeWithScale from '@/utils/changeComponentsSizeWithScale'
@@ -72,8 +72,35 @@ export const useMainStore = defineStore('main', {
     isClickComponent: false,
     rightList: true,
     isDarkMode: false,
+    componentList: defaultList as Component[], // 组件库列表
   }),
   actions: {
+    // Component List Management
+    setComponentList(list: Component[]) {
+      this.componentList = list
+    },
+    addComponentToList(component: Component) {
+      // 尝试查找同名组件的默认配置，以补全样式键值
+      const defaultComponent = defaultList.find((c) => c.component === component.component)
+      let defaultStyle = {}
+      if (defaultComponent) {
+        defaultStyle = { ...defaultComponent.style }
+      }
+
+      // 确保组件包含公共属性，防止缺少字段导致错误
+      const componentWithCommon = {
+        ...commonAttr,
+        ...component,
+        style: {
+          ...commonStyle,
+          ...defaultStyle, // 补全默认样式键值
+          ...component.style, // 覆盖自定义样式
+        },
+      }
+      // 再次深拷贝以断开引用（特别是 commonAttr 里的引用类型）
+      this.componentList.push(deepCopy(componentWithCommon))
+    },
+
     // Animation
     addAnimation(animation: any) {
       if (this.curComponent) {
