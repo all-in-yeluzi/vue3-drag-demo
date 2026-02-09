@@ -108,6 +108,7 @@ onMounted(() => {
 
 const handleMouseDown = (e: MouseEvent) => {
   hideArea()
+  if (!store.editor) return
   const rectInfo = store.editor.getBoundingClientRect()
   editorX.value = rectInfo.x
   editorY.value = rectInfo.y

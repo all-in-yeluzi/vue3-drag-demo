@@ -186,8 +186,12 @@ onMounted(() => {
 })
 
 const handleComponentAlign = (command: any) => {
-  store[command as keyof typeof store]()
-  store.recordSnapshot()
+  // @ts-ignore
+  if (typeof store[command] === 'function') {
+    // @ts-ignore
+    store[command]()
+    store.recordSnapshot()
+  }
 
   let top = Infinity,
     left = Infinity
@@ -319,10 +323,13 @@ const preview = (screenshot: boolean) => {
   store.setEditMode('preview')
 }
 
+const emits = defineEmits(['save'])
+
 const save = () => {
-  localStorage.setItem('canvasData', JSON.stringify(componentData.value))
+    localStorage.setItem('canvasData', JSON.stringify(componentData.value))
   localStorage.setItem('canvasStyle', JSON.stringify(canvasStyleData.value))
   toast('保存成功', 'success')
+  emits('save')
 }
 
 const clearCanvas = () => {

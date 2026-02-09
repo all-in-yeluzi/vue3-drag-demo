@@ -68,7 +68,7 @@ const setCurComponent = (index: number) => {
 
 <style lang="scss" scoped>
 .real-time-component-list {
-  height: 35%;
+  height: 100%;
 
   .list {
     height: 30px;

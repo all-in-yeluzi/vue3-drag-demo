@@ -1,5 +1,5 @@
 <template>
-  <div class="attr-list">
+  <div class="attr-list" v-if="curComponent">
     <CommonAttr></CommonAttr>
     <el-form>
       <el-form-item label="镜像翻转">

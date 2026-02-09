@@ -37,14 +37,14 @@ const curTd = ref('')
 const canEdit = ref(false)
 
 const tableData = computed(() => {
-  return curComponent.value.propValue.data
+  return curComponent.value ? curComponent.value.propValue.data : []
 })
 
 const onDblclick = () => {
   canEdit.value = true
 }
 
-const onClick = (row: number, col: number) => {
+const onClick = (row: any, col: any) => {
   curTd.value = `${row},${col}`
 }
 

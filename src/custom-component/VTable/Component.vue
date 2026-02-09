@@ -5,7 +5,7 @@
         v-for="(item, index) in propValue.data"
         :key="index"
         :class="{
-          stripe: propValue.stripe && index % 2,
+          stripe: propValue.stripe && Number(index) % 2,
           bold: propValue.thBold && index === 0,
         }"
       >

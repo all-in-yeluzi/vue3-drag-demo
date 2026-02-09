@@ -1,9 +1,14 @@
 <template>
-  <div class="event-list">
+  <div class="event-list" v-if="curComponent">
     <div class="div-events">
       <el-button @click="isShowEvent = true">添加事件</el-button>
       <div>
-        <el-tag v-for="event in Object.keys(curComponent.events)" :key="event" closable @close="removeEvent(event)">
+        <el-tag
+          v-for="event in Object.keys(curComponent.events || {})"
+          :key="event"
+          closable
+          @close="removeEvent(event)"
+        >
           {{ event }}
         </el-tag>
       </div>

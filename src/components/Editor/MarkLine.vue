@@ -56,6 +56,7 @@ const hideLine = () => {
 }
 
 const showLine = (isDownward: boolean, isRightward: boolean) => {
+  if (!curComponent.value) return
   const lines = lineRefs.value
   const components = componentData.value
   const curComponentStyle = getComponentRotatedStyle(curComponent.value.style)
@@ -150,7 +151,7 @@ const showLine = (isDownward: boolean, isRightward: boolean) => {
     }
 
     const needToShow: string[] = []
-    const { rotate } = curComponent.value.style
+    const { rotate } = curComponent.value!.style
     Object.keys(conditions).forEach((key) => {
       // 遍历符合的条件并处理
       conditions[key].forEach((condition: any) => {
@@ -176,7 +177,7 @@ const showLine = (isDownward: boolean, isRightward: boolean) => {
 }
 
 const translatecurComponentShift = (key: string, condition: any, curComponentStyle: any) => {
-  const { width, height } = curComponent.value.style
+  const { width, height } = curComponent.value!.style
   if (key == 'top') {
     return Math.round(condition.dragShift - (height - curComponentStyle.height) / 2)
   }

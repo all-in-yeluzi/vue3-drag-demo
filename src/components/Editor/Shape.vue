@@ -17,6 +17,7 @@
 import { ref, onMounted, nextTick } from 'vue'
 import { useMainStore } from '@/store'
 import { storeToRefs } from 'pinia'
+import type { Component } from '@/types'
 import eventBus from '@/utils/eventBus'
 import runAnimation from '@/utils/runAnimation'
 import calculateComponentPositonAndSize from '@/utils/calculateComponentPositonAndSize'
@@ -167,6 +168,7 @@ const getPointStyle = (point: string) => {
 }
 
 const getCursor = () => {
+  if (!curComponent.value) return {}
   const { rotate } = curComponent.value.style
   const rotateMod = mod360(rotate)
   const result: any = {}
@@ -205,7 +207,7 @@ const handleMouseDownOnShape = (e: any) => {
   e.stopPropagation()
   const indexNum: number = typeof props.index === 'string' ? Number(props.index as any) : (props.index as number)
   store.setCurComponent({
-    component: props.element,
+    component: props.element as Component,
     index: isNaN(indexNum) ? null : indexNum,
   })
   if (props.element.isLock) return

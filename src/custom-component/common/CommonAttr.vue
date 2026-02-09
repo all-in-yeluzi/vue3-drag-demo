@@ -1,5 +1,5 @@
 <template>
-  <div class="v-common-attr" @mousedown="setInitial(curComponent.style)">
+  <div class="v-common-attr" v-if="curComponent" @mousedown="setInitial(curComponent.style)">
     <el-collapse v-model="activeName" accordion @change="onChange">
       <el-collapse-item title="通用样式" name="style">
         <el-form>
@@ -63,6 +63,7 @@ const setInitial = (style: any) => {
 }
 
 const setFontSize = () => {
+  if (!curComponent.value) return
   const proportion = curComponent.value.style.fontSize / initialStyle.value.fontSize
   const updatedStyle = {
     width: Number((proportion * initialStyle.value.width).toFixed(4)),

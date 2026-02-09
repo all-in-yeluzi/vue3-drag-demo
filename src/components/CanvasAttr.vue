@@ -5,10 +5,10 @@
       <el-form-item v-for="(key, index) in Object.keys(options)" :key="index" :label="options[key]">
         <el-color-picker
           v-if="isIncludesColor(key)"
-          v-model="canvasStyleData[key]"
+          v-model="canvasStyleDataAny[key]"
           show-alpha
         ></el-color-picker>
-        <el-input v-else v-model.number="canvasStyleData[key]" type="number" />
+        <el-input v-else v-model.number="canvasStyleDataAny[key]" type="number" />
       </el-form-item>
     </el-form>
   </div>
@@ -20,6 +20,7 @@ import { storeToRefs } from 'pinia'
 
 const store = useMainStore()
 const { canvasStyleData } = storeToRefs(store)
+const canvasStyleDataAny = canvasStyleData as any
 
 const options: any = {
   color: '颜色',

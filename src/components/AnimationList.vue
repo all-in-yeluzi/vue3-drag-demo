@@ -1,5 +1,5 @@
 <template>
-  <div class="animation-list">
+  <div class="animation-list" v-if="curComponent">
     <div class="div-animation">
       <el-button @click="isShowAnimation = true">添加动画</el-button>
       <el-button @click="previewAnimate">预览动画</el-button>
@@ -76,15 +76,15 @@ const previewAnimate = () => {
   eventBus.emit('runAnimation')
 }
 
-const removeAnimation = (index: number) => {
+const removeAnimation = (index: any) => {
   store.removeAnimation(index)
-  if (!curComponent.value.animations.length) {
+  if (curComponent.value && curComponent.value.animations && !curComponent.value.animations.length) {
     // 清空动画数据，停止运动
     eventBus.emit('stopAnimation')
   }
 }
 
-const handleAnimationSetting = (index: number) => {
+const handleAnimationSetting = (index: any) => {
   isShowAnimationSetting.value = true
   curIndex.value = index
 }

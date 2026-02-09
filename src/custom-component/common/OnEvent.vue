@@ -24,12 +24,12 @@ export default defineComponent({
       })
     }
 
-    const onClick = (componentId: string) => {
+    const onClick = (componentId: any) => {
       const data = props.linkage.data.filter((item: any) => item.id === componentId && item.event === 'v-click')
       changeStyle(data)
     }
 
-    const onHover = (componentId: string) => {
+    const onHover = (componentId: any) => {
       const data = props.linkage.data.filter((item: any) => item.id === componentId && item.event === 'v-hover')
       changeStyle(data)
     }

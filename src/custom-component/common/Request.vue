@@ -1,6 +1,6 @@
 <template>
-  <el-collapse-item title="数据来源（预览生效）" name="request" class="request-container">
-    <el-form>
+  <el-collapse-item v-if="curComponent" title="数据来源（预览生效）" name="request" class="request-container">
+    <el-form v-if="request">
       <el-form-item label="请求地址">
         <el-input v-model.trim="request.url" @blur="validateURL">
           <template #prepend>HTTPS://</template>
@@ -56,23 +56,25 @@ import { ElMessage } from 'element-plus'
 const store = useMainStore()
 const { curComponent } = storeToRefs(store)
 
-const request = curComponent.value.request
+const request = curComponent.value ? curComponent.value.request : null
+
 const methodOptions = ['GET', 'POST', 'PUT', 'DELETE']
 const dataOptions = ['object', 'array', 'string']
 
 const addArrayData = () => {
-  request.data.push('')
+  if (request) request.data.push('')
 }
 
 const addData = () => {
-  request.data.push(['', ''])
+  if (request) request.data.push(['', ''])
 }
 
-const deleteData = (index: number) => {
-  request.data.splice(index, 1)
+const deleteData = (index: any) => {
+  if (request) request.data.splice(index, 1)
 }
 
 const onChange = () => {
+  if (!request) return
   if (request.paramType === 'array') {
     request.data = ['']
   } else {
@@ -81,6 +83,7 @@ const onChange = () => {
 }
 
 const validateURL = () => {
+  if (!request) return
   const url = request.url
   if ((url && /^\d+$/.test(url)) || !urlRE.test(getURL(url))) {
     ElMessage.error('请输入正确的 URL')

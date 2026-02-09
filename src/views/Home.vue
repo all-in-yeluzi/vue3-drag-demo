@@ -1,12 +1,11 @@
 <template>
   <div :class="!isDarkMode ? 'home' : 'home dark'">
-    <Toolbar />
+    <Toolbar @save="onSave" />
 
     <main>
       <!-- 左侧组件列表 -->
       <section :class="leftList ? 'left active' : 'left inactive'">
         <ComponentList />
-        <RealTimeComponentList />
       </section>
       <el-button
         title="show-list-btn"
@@ -54,15 +53,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch, type PropType } from 'vue'
 import { useMainStore, setDefaultcomponentData } from '@/store'
 import { storeToRefs } from 'pinia'
+import type { Component, CanvasStyleData } from '@/types'
 import Editor from '@/components/Editor/index.vue'
 import ComponentList from '@/components/ComponentList.vue'
 import AnimationList from '@/components/AnimationList.vue'
 import EventList from '@/components/EventList.vue'
 import Toolbar from '@/components/Toolbar.vue'
-import RealTimeComponentList from '@/components/RealTimeComponentList.vue'
 import CanvasAttr from '@/components/CanvasAttr.vue'
 import componentList from '@/custom-component/component-list'
 import { deepCopy } from '@/utils/utils'
@@ -71,11 +70,50 @@ import { listenGlobalKeyDown } from '@/utils/shortcutKey'
 import { changeComponentSizeWithScale } from '@/utils/changeComponentsSizeWithScale'
 import { ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
 
+const props = defineProps({
+  data: {
+    type: Array as PropType<Component[]>,
+    default: () => null,
+  },
+  canvasStyle: {
+    type: Object as PropType<CanvasStyleData>,
+    default: () => null,
+  },
+})
+
+const emits = defineEmits(['save'])
+
 const store = useMainStore()
 const { curComponent, isClickComponent, rightList, isDarkMode } = storeToRefs(store)
 
 const activeName = ref('attr')
 const leftList = ref(true)
+
+const onSave = () => {
+  emits('save', {
+    componentData: store.componentData,
+    canvasStyleData: store.canvasStyleData,
+  })
+}
+
+const getData = async () => {
+  return {
+    componentData: store.componentData,
+    canvasStyleData: store.canvasStyleData,
+  }
+}
+
+const setData = async (data: any) => {
+  if (data) {
+    if (data.componentData) store.setComponentData(data.componentData)
+    if (data.canvasStyleData) store.setCanvasStyle(data.canvasStyleData)
+  }
+}
+
+defineExpose({
+  getData,
+  setData,
+})
 
 onMounted(() => {
   restore()
@@ -89,15 +127,31 @@ onMounted(() => {
   }
 })
 
+watch(
+  () => props.data,
+  (newData) => {
+    if (newData) {
+      store.setComponentData(newData)
+    }
+  },
+  { deep: true },
+)
+
 const restore = () => {
-  // 用保存的数据恢复画布
-  if (localStorage.getItem('canvasData')) {
+  // 优先使用 props 传入的数据
+  if (props.data) {
+    setDefaultcomponentData(props.data)
+    store.setComponentData(props.data)
+  } else if (localStorage.getItem('canvasData')) {
+    // 用保存的数据恢复画布
     const data = JSON.parse(localStorage.getItem('canvasData') as string)
     setDefaultcomponentData(data)
     store.setComponentData(data)
   }
 
-  if (localStorage.getItem('canvasStyle')) {
+  if (props.canvasStyle) {
+    store.setCanvasStyle(props.canvasStyle)
+  } else if (localStorage.getItem('canvasStyle')) {
     store.setCanvasStyle(JSON.parse(localStorage.getItem('canvasStyle') as string))
   }
 }
@@ -107,7 +161,7 @@ const handleDrop = (e: any) => {
   e.stopPropagation()
 
   const index = e.dataTransfer.getData('index')
-  const rectInfo = store.editor.getBoundingClientRect()
+  const rectInfo = store.editor!.getBoundingClientRect()
   if (index) {
     const component = deepCopy(componentList[index])
     component.style.top = e.clientY - rectInfo.y

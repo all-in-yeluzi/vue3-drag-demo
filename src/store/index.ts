@@ -8,14 +8,15 @@ import { createGroupStyle, getComponentRotatedStyle } from '@/utils/style'
 import { deepCopy, swap } from '@/utils/utils'
 import changeComponentsSizeWithScale from '@/utils/changeComponentsSizeWithScale'
 import toast from '@/utils/toast'
+import type { Component, CanvasStyleData, AreaData, CopyData } from '@/types'
 
 // 设置画布默认数据 https://github.com/woai3c/visual-drag-demo/issues/92
-let defaultcomponentData: any[] = []
+let defaultcomponentData: Component[] = []
 function getDefaultcomponentData() {
   return JSON.parse(JSON.stringify(defaultcomponentData))
 }
 
-export function setDefaultcomponentData(data = []) {
+export function setDefaultcomponentData(data: Component[] = []) {
   defaultcomponentData = data
 }
 
@@ -31,8 +32,8 @@ export const useMainStore = defineStore('main', {
         height: 0,
       },
       components: [],
-    } as any,
-    editor: null as any,
+    } as AreaData,
+    editor: null as HTMLElement | null,
 
     // ...contextmenu.state
     menuTop: 0,
@@ -40,14 +41,14 @@ export const useMainStore = defineStore('main', {
     menuShow: false,
 
     // ...copy.state
-    copyData: null as any,
+    copyData: null as CopyData | null,
     isCut: false,
 
     // ...event.state (none)
     // ...layer.state (none)
 
     // ...snapshot.state
-    snapshotData: [] as any[],
+    snapshotData: [] as Component[][],
     snapshotIndex: -1,
 
     // ...lock.state (none)
@@ -63,10 +64,10 @@ export const useMainStore = defineStore('main', {
       opacity: 1,
       background: '#fff',
       fontSize: 14,
-    },
+    } as CanvasStyleData,
     isInEdiotr: false,
-    componentData: [] as any[],
-    curComponent: null as any,
+    componentData: [] as Component[],
+    curComponent: null as Component | null,
     curComponentIndex: null as number | null,
     isClickComponent: false,
     rightList: true,
@@ -76,16 +77,17 @@ export const useMainStore = defineStore('main', {
     // Animation
     addAnimation(animation: any) {
       if (this.curComponent) {
+        this.curComponent.animations = this.curComponent.animations || []
         this.curComponent.animations.push(animation)
       }
     },
     removeAnimation(index: number) {
-      if (this.curComponent) {
+      if (this.curComponent && this.curComponent.animations) {
         this.curComponent.animations.splice(index, 1)
       }
     },
     alterAnimation({ index, data = {} }: { index: number; data: any }) {
-      if (this.curComponent && typeof index === 'number') {
+      if (this.curComponent && this.curComponent.animations && typeof index === 'number') {
         const original = this.curComponent.animations[index]
         this.curComponent.animations[index] = { ...original, ...data }
       }
@@ -95,7 +97,7 @@ export const useMainStore = defineStore('main', {
     getEditor() {
       this.editor = $('#editor')
     },
-    setAreaData(data: any) {
+    setAreaData(data: AreaData) {
       this.areaData = data
     },
     compose() {
@@ -108,7 +110,7 @@ export const useMainStore = defineStore('main', {
           // 如果要组合的组件中，已经存在组合数据，则需要提前拆分
           const parentStyle = { ...component.style }
           const subComponents = component.propValue
-          const editorRect = this.editor.getBoundingClientRect()
+          const editorRect = this.editor!.getBoundingClientRect()
 
           subComponents.forEach((component: any) => {
             decomposeComponent(component, editorRect, parentStyle)
@@ -164,6 +166,7 @@ export const useMainStore = defineStore('main', {
       })
     },
     decompose() {
+      if (!this.curComponent || !this.editor) return
       const curComponent = this.curComponent
       const editor = this.editor
       const parentStyle = { ...curComponent.style }
@@ -238,9 +241,10 @@ export const useMainStore = defineStore('main', {
       }
     },
     copyDataHelper() {
+      if (!this.curComponent) return
       this.copyData = {
         data: deepCopy(this.curComponent),
-        index: this.curComponentIndex,
+        index: this.curComponentIndex!,
       }
     },
     deepCopyHelper(data: any) {
@@ -257,11 +261,12 @@ export const useMainStore = defineStore('main', {
     // Event
     addEvent({ event, param }: { event: string; param: any }) {
       if (this.curComponent) {
+        this.curComponent.events = this.curComponent.events || {}
         this.curComponent.events[event] = param
       }
     },
     removeEvent(event: string) {
-      if (this.curComponent) {
+      if (this.curComponent && this.curComponent.events) {
         delete this.curComponent.events[event]
       }
     },
@@ -286,7 +291,7 @@ export const useMainStore = defineStore('main', {
     topComponent() {
       if (this.curComponentIndex !== null && this.curComponentIndex < this.componentData.length - 1) {
         this.componentData.splice(this.curComponentIndex, 1)
-        this.componentData.push(this.curComponent)
+        this.componentData.push(this.curComponent!)
         this.curComponentIndex = this.componentData.length - 1
       } else {
         toast('已经到顶了')
@@ -295,7 +300,7 @@ export const useMainStore = defineStore('main', {
     bottomComponent() {
       if (this.curComponentIndex !== null && this.curComponentIndex > 0) {
         this.componentData.splice(this.curComponentIndex, 1)
-        this.componentData.unshift(this.curComponent)
+        this.componentData.unshift(this.curComponent!)
         this.curComponentIndex = 0
       } else {
         toast('已经到底了')
@@ -335,6 +340,13 @@ export const useMainStore = defineStore('main', {
       if (this.snapshotIndex < this.snapshotData.length - 1) {
         this.snapshotData = this.snapshotData.slice(0, this.snapshotIndex + 1)
       }
+
+      // 限制快照数量，防止内存溢出
+      const SNAPSHOT_LIMIT = 50
+      if (this.snapshotData.length > SNAPSHOT_LIMIT) {
+        this.snapshotData.shift()
+        this.snapshotIndex--
+      }
     },
 
     // Lock
@@ -364,8 +376,8 @@ export const useMainStore = defineStore('main', {
           this.changeAlign(component, { left: component.style.left - diffX })
         })
       } else {
-        let rotateLeft = getComponentRotatedStyle(this.curComponent.style)
-        let newLeft = this.curComponent.style.left - rotateLeft.left
+        let rotateLeft = getComponentRotatedStyle(this.curComponent!.style)
+        let newLeft = this.curComponent!.style.left - rotateLeft.left
         this.changeAlign(this.curComponent, { left: newLeft })
       }
     },
@@ -383,8 +395,8 @@ export const useMainStore = defineStore('main', {
           this.changeAlign(component, { left: component.style.left + diffX })
         })
       } else {
-        let rotatedStyle = getComponentRotatedStyle(this.curComponent.style)
-        let newLeft = this.curComponent.style.left - rotatedStyle.left
+        let rotatedStyle = getComponentRotatedStyle(this.curComponent!.style)
+        let newLeft = this.curComponent!.style.left - rotatedStyle.left
         let right = this.canvasStyleData.width + newLeft - rotatedStyle.width
         this.changeAlign(this.curComponent, { left: right })
       }
@@ -405,10 +417,10 @@ export const useMainStore = defineStore('main', {
           this.changeAlign(component, { left: component.style.left + diffX })
         })
       } else {
-        let rotatedStyle = getComponentRotatedStyle(this.curComponent.style)
+        let rotatedStyle = getComponentRotatedStyle(this.curComponent!.style)
         let canvasCenterX = this.canvasStyleData.width / 2
         let componentCenterX = (rotatedStyle.left + rotatedStyle.right) / 2
-        let newLeft = this.curComponent.style.left + (canvasCenterX - componentCenterX)
+        let newLeft = this.curComponent!.style.left + (canvasCenterX - componentCenterX)
         this.changeAlign(this.curComponent, { left: newLeft })
       }
     },
@@ -426,8 +438,8 @@ export const useMainStore = defineStore('main', {
           this.changeAlign(component, { top: component.style.top - diffY })
         })
       } else {
-        let rotatedStyle = getComponentRotatedStyle(this.curComponent.style)
-        let newTop = this.curComponent.style.top - rotatedStyle.top
+        let rotatedStyle = getComponentRotatedStyle(this.curComponent!.style)
+        let newTop = this.curComponent!.style.top - rotatedStyle.top
         this.changeAlign(this.curComponent, { top: newTop })
       }
     },
@@ -445,8 +457,8 @@ export const useMainStore = defineStore('main', {
           this.changeAlign(component, { top: component.style.top + diffY })
         })
       } else {
-        let rotatedStyle = getComponentRotatedStyle(this.curComponent.style)
-        let newTop = this.curComponent.style.top - rotatedStyle.top
+        let rotatedStyle = getComponentRotatedStyle(this.curComponent!.style)
+        let newTop = this.curComponent!.style.top - rotatedStyle.top
         let top = this.canvasStyleData.height + newTop - rotatedStyle.height
         this.changeAlign(this.curComponent, { top })
       }
@@ -467,10 +479,10 @@ export const useMainStore = defineStore('main', {
           this.changeAlign(component, { top: component.style.top + diffY })
         })
       } else {
-        let rotatedStyle = getComponentRotatedStyle(this.curComponent.style)
+        let rotatedStyle = getComponentRotatedStyle(this.curComponent!.style)
         let canvasCenterY = this.canvasStyleData.height / 2
         let componentCenterY = (rotatedStyle.top + rotatedStyle.bottom) / 2
-        let newTop = this.curComponent.style.top + (canvasCenterY - componentCenterY)
+        let newTop = this.curComponent!.style.top + (canvasCenterY - componentCenterY)
         this.changeAlign(this.curComponent, { top: newTop })
       }
     },
@@ -531,7 +543,7 @@ export const useMainStore = defineStore('main', {
     },
 
     // Main
-    aceSetCanvasData(value: any) {
+    aceSetCanvasData(value: CanvasStyleData) {
       this.canvasStyleData = value
     },
     setLastScale(value: number) {
@@ -563,10 +575,10 @@ export const useMainStore = defineStore('main', {
     setInEditorStatus(status: boolean) {
       this.isInEdiotr = status
     },
-    setCanvasStyle(style: any) {
+    setCanvasStyle(style: CanvasStyleData) {
       this.canvasStyleData = style
     },
-    setCurComponent({ component, index }: { component: any; index: number | null }) {
+    setCurComponent({ component, index }: { component: Component | null; index: number | null }) {
       this.curComponent = component
       this.curComponentIndex = index
     },
@@ -588,7 +600,7 @@ export const useMainStore = defineStore('main', {
     setComponentData(componentData: any[] = []) {
       this.componentData = componentData
     },
-    addComponent({ component, index }: { component: any; index?: number }) {
+    addComponent({ component, index }: { component: Component; index?: number }) {
       if (index !== undefined) {
         this.componentData.splice(index, 0, component)
       } else {

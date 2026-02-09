@@ -1,7 +1,12 @@
 {
-  "name": "visual-drag-demo",
+  "name": "z-vdc",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "main": "dist/z-vdc.umd.js",
+  "module": "dist/z-vdc.es.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
@@ -26,14 +31,14 @@
   "devDependencies": {
     "@types/node": "^20.3.1",
     "@vitejs/plugin-vue": "^4.2.3",
-    "sass": "^1.63.6",
-    "typescript": "^5.0.2",
-    "vite": "^4.3.9",
-    "vue-tsc": "^1.8.0",
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-vue": "^9.14.1",
-    "prettier": "^2.8.8"
+    "prettier": "^2.8.8",
+    "sass": "^1.63.6",
+    "typescript": "^5.0.2",
+    "vite": "^4.3.9",
+    "vue-tsc": "^3.2.4"
   }
 }

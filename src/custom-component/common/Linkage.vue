@@ -1,7 +1,12 @@
 <template>
-  <el-collapse-item title="组件联动（预览生效）" name="linkage" class="linkage-container">
+  <el-collapse-item
+    v-if="curComponent"
+    title="组件联动（预览生效）"
+    name="linkage"
+    class="linkage-container"
+  >
     <el-form>
-      <div v-for="(item, index) in linkage.data" :key="index" class="linkage-component">
+      <div v-for="(item, index) in linkage?.data || []" :key="index" class="linkage-component">
         <div class="div-guanbi" @click="deleteLinkageData(index)">
           <span class="iconfont icon-guanbi"></span>
         </div>
@@ -44,7 +49,7 @@
       </div>
       <el-button style="margin-bottom: 10px" @click="addComponent">添加组件</el-button>
       <p>过渡时间（秒）</p>
-      <el-input v-model="linkage.duration" class="input-duration" placeholder="请输入"></el-input>
+      <el-input v-if="linkage" v-model="linkage.duration" class="input-duration" placeholder="请输入"></el-input>
     </el-form>
   </el-collapse-item>
 </template>
@@ -58,7 +63,7 @@ import { styleMap, optionMap, selectKey } from '@/utils/attr'
 const store = useMainStore()
 const { componentData, curComponent } = storeToRefs(store)
 
-const linkage = curComponent.value.linkage
+const linkage = curComponent.value ? curComponent.value.linkage : null
 const eventOptions = [
   { label: '点击', value: 'v-click' },
   { label: '悬浮', value: 'v-hover' },
@@ -88,19 +93,24 @@ const addAttr = (style: any[]) => {
 }
 
 const addComponent = () => {
-  linkage.data.push({
-    id: '',
-    event: '',
-    style: [{ key: '', value: '' }],
-  })
+  if (linkage) {
+    linkage.data.push({
+      id: '',
+      label: '',
+      event: '',
+      style: [{ key: '', value: '' }],
+    })
+  }
 }
 
-const deleteData = (style: any[], index: number) => {
+const deleteData = (style: any[], index: any) => {
   style.splice(index, 1)
 }
 
-const deleteLinkageData = (index: number) => {
-  linkage.data.splice(index, 1)
+const deleteLinkageData = (index: any) => {
+  if (linkage) {
+    linkage.data.splice(index, 1)
+  }
 }
 </script>
 

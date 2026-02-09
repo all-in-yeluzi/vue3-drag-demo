@@ -49,10 +49,10 @@ const { curComponent } = storeToRefs(store)
 const config = ref<any>({})
 
 const isDisabled = computed(() => {
-  return curComponent.value.animations.length > 1
+  return curComponent.value && curComponent.value.animations ? curComponent.value.animations.length > 1 : false
 })
 
-const { label, animationTime, isLoop = false, value } = curComponent.value.animations[props.curIndex] || {}
+const { label, animationTime, isLoop = false, value } = curComponent.value && curComponent.value.animations ? (curComponent.value.animations[props.curIndex] || {}) : {}
 config.value = {
   animationTime,
   label,

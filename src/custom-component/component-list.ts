@@ -1,9 +1,12 @@
 import titleImg from '@/assets/title.jpg'
+import type { Component } from '@/types'
 
 // 公共样式
 export const commonStyle = {
   rotate: 0,
   opacity: 1,
+  top: 0,
+  left: 0,
 }
 
 export const commonAttr = {
@@ -33,6 +36,8 @@ const list = [
     label: '文字',
     propValue: '双击编辑文字',
     icon: 'wenben',
+    category: 'base',
+    subcategory: 'text',
     request: {
       method: 'GET',
       data: [],
@@ -58,6 +63,8 @@ const list = [
     label: '按钮',
     propValue: '按钮',
     icon: 'button',
+    category: 'base',
+    subcategory: 'basic',
     style: {
       width: 100,
       height: 34,
@@ -77,6 +84,8 @@ const list = [
     component: 'Picture',
     label: '图片',
     icon: 'tupian',
+    category: 'base',
+    subcategory: 'media',
     propValue: {
       url: titleImg,
       flip: {
@@ -95,6 +104,8 @@ const list = [
     label: '矩形',
     propValue: '&nbsp;',
     icon: 'juxing',
+    category: 'shape',
+    subcategory: 'basic',
     style: {
       width: 200,
       height: 200,
@@ -117,6 +128,8 @@ const list = [
     label: '直线',
     propValue: '',
     icon: 'zhixian',
+    category: 'shape',
+    subcategory: 'basic',
     style: {
       width: 200,
       height: 2,
@@ -128,6 +141,8 @@ const list = [
     label: '圆形',
     propValue: '&nbsp;',
     icon: '24gl-circle',
+    category: 'shape',
+    subcategory: 'basic',
     style: {
       width: 200,
       height: 200,
@@ -150,6 +165,8 @@ const list = [
     label: '星形',
     icon: 'kongwujiaoxing',
     propValue: '',
+    category: 'shape',
+    subcategory: 'svg',
     style: {
       width: 80,
       height: 80,
@@ -169,6 +186,8 @@ const list = [
     label: '三角形',
     icon: 'xingzhuang-sanjiaoxing',
     propValue: '',
+    category: 'shape',
+    subcategory: 'svg',
     style: {
       width: 80,
       height: 80,
@@ -187,6 +206,8 @@ const list = [
     component: 'VTable',
     label: '表格',
     icon: 'biaoge',
+    category: 'functional',
+    subcategory: 'table',
     propValue: {
       data: [
         ['表头1', '表头2', '表头3'],
@@ -216,8 +237,10 @@ const list = [
   },
   {
     component: 'VChart',
-    label: '图表',
+    label: '柱状图',
     icon: 'el-icon-data-analysis',
+    category: 'chart',
+    subcategory: 'bar',
     propValue: {
       chart: 'VChart',
       option: {
@@ -258,6 +281,94 @@ const list = [
       borderRadius: '',
     },
   },
+  {
+    component: 'VChart',
+    label: '折线图',
+    icon: 'el-icon-data-analysis',
+    category: 'chart',
+    subcategory: 'line',
+    propValue: {
+      chart: 'VChart',
+      option: {
+        title: {
+          text: '折线图',
+          show: true,
+        },
+        legend: {
+          show: true,
+        },
+        tooltip: {
+          show: true,
+          trigger: 'item',
+        },
+        xAxis: {
+          show: true,
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        },
+        yAxis: {},
+        series: [
+          {
+            data: [150, 230, 224, 218, 135, 147, 260],
+            type: 'line',
+          },
+        ],
+      },
+    },
+    style: {
+      width: 800,
+      height: 500,
+      borderRadius: '',
+    },
+  },
+  {
+    component: 'VChart',
+    label: '饼图',
+    icon: 'el-icon-data-analysis',
+    category: 'chart',
+    subcategory: 'pie',
+    propValue: {
+      chart: 'VChart',
+      option: {
+        title: {
+          text: '饼图',
+          left: 'center',
+        },
+        tooltip: {
+          trigger: 'item',
+        },
+        legend: {
+          orient: 'vertical',
+          left: 'left',
+        },
+        series: [
+          {
+            name: 'Access From',
+            type: 'pie',
+            radius: '50%',
+            data: [
+              { value: 1048, name: 'Search Engine' },
+              { value: 735, name: 'Direct' },
+              { value: 580, name: 'Email' },
+              { value: 484, name: 'Union Ads' },
+              { value: 300, name: 'Video Ads' },
+            ],
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)',
+              },
+            },
+          },
+        ],
+      },
+    },
+    style: {
+      width: 600,
+      height: 500,
+      borderRadius: '',
+    },
+  },
 ]
 
 for (let i = 0, len = list.length; i < len; i++) {
@@ -266,4 +377,4 @@ for (let i = 0, len = list.length; i < len; i++) {
   list[i] = { ...commonAttr, ...item }
 }
 
-export default list
+export default list as unknown as Component[]
