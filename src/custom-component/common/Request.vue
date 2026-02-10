@@ -1,0 +1,165 @@
+<template>
+  <el-collapse-item v-if="curComponent" title="数据来源" name="request" class="request-container">
+    <el-form v-if="request">
+      <el-form-item label="请求地址">
+        <el-input v-model.trim="request.url" @blur="validateURL">
+          <template #prepend>HTTPS://</template>
+        </el-input>
+      </el-form-item>
+      <el-form-item label="请求方法">
+        <el-select v-model="request.method">
+          <el-option v-for="item in methodOptions" :key="item" :label="item" :value="item"> </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="请求参数">
+        <el-select v-model="request.paramType" placeholder="参数类型" @change="onChange">
+          <el-option v-for="item in dataOptions" :key="item" :label="item" :value="item"> </el-option>
+        </el-select>
+        <div v-if="request.paramType === 'array'" class="param-container">
+          <p>数据项</p>
+          <div v-for="(item, index) in request.data" :key="index" class="div-delete">
+            <el-input v-model="request.data[index]" placeholder="请输入参数值"></el-input>
+            <span class="iconfont icon-shanchu" @click="deleteData(index)"></span>
+          </div>
+
+          <el-button @click="addArrayData">添加</el-button>
+        </div>
+        <div v-else-if="request.paramType === 'string' || request.paramType === 'object'" class="param-container">
+          <p>数据项</p>
+          <div v-for="(item, index) in request.data" :key="index" class="param-object-container">
+            <el-input v-model="item[0]" placeholder="参数名"></el-input>
+            <el-input v-model="item[1]" placeholder="参数值"></el-input>
+            <span class="iconfont icon-shanchu" @click="deleteData(index)"></span>
+          </div>
+          <el-button @click="addData">添加</el-button>
+        </div>
+      </el-form-item>
+      <el-form-item label="定时触发">
+        <el-switch v-model="request.series"></el-switch>
+        <template v-if="request.series">
+          <p>触发间隔（毫秒）</p>
+          <el-input v-model="request.time" type="number"></el-input>
+          <p>触发次数（0 为无限）</p>
+          <el-input v-model="request.requestCount" type="number"></el-input>
+        </template>
+      </el-form-item>
+      <el-form-item label="数据过滤">
+        <el-tooltip content="编写JS代码处理数据，变量 data 为接口返回数据，需 return 处理后的结果。例如：return data.data" placement="top">
+             <i class="el-icon-info"></i>
+        </el-tooltip>
+        <el-input 
+          v-model="request.dataHandler" 
+          type="textarea" 
+          :rows="4" 
+          placeholder="function filter(data) { return data.data }"
+        ></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="fetchData">立即获取数据</el-button>
+      </el-form-item>
+    </el-form>
+  </el-collapse-item>
+</template>
+
+<script setup lang="ts">
+import { useMainStore } from '@/store'
+import { storeToRefs } from 'pinia'
+import { urlRE, getURL } from '@/utils/request'
+import dataManager from '@/utils/data-manager'
+import { ElMessage } from 'element-plus'
+
+const store = useMainStore()
+const { curComponent } = storeToRefs(store)
+
+const request = curComponent.value ? curComponent.value.request : null
+
+const methodOptions = ['GET', 'POST', 'PUT', 'DELETE']
+const dataOptions = ['object', 'array', 'string']
+
+const addArrayData = () => {
+  if (request) request.data.push('')
+}
+
+const addData = () => {
+  if (request) request.data.push(['', ''])
+}
+
+const deleteData = (index: any) => {
+  if (request) request.data.splice(index, 1)
+}
+
+const onChange = () => {
+  if (!request) return
+  if (request.paramType === 'array') {
+    request.data = ['']
+  } else {
+    request.data = [['', '']]
+  }
+}
+
+const validateURL = () => {
+  if (!request) return
+  const url = request.url
+  if ((url && /^\d+$/.test(url)) || !urlRE.test(getURL(url))) {
+    ElMessage.error('请输入正确的 URL')
+  }
+}
+
+const fetchData = async () => {
+  if (!request || !curComponent.value) return
+  
+  if (!request.url) {
+    ElMessage.error('请输入请求地址')
+    return
+  }
+
+  // 使用 DataManager 统一管理请求，支持数据过滤
+  await dataManager.fetchOne(curComponent.value)
+  ElMessage.success('请求发送成功')
+}
+</script>
+
+<style lang="scss" scoped>
+.request-container {
+  .param-container {
+    margin-top: 10px;
+
+    .el-button {
+      margin-top: 10px;
+    }
+
+    .param-object-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+
+      .el-input {
+        width: 98px;
+      }
+
+      .el-button {
+        margin: 0;
+        margin-left: 8px;
+      }
+    }
+
+    .div-delete {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+
+      .el-button {
+        margin: 0;
+        margin-left: 8px;
+      }
+    }
+  }
+
+  .icon-shanchu {
+    cursor: pointer;
+    margin-left: 10px;
+  }
+}
+</style>
