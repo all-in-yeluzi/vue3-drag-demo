@@ -1,4 +1,4 @@
-基于[visual-drag-demo](https://woai3c.github.io/visual-drag-demo)的低代码平台前端部分，靠拖拉拽生成页面。
+基于[visual-drag-demo](https://woai3c.github.io/visual-drag-demo)的低代码平台，
 升级vue3+typeScript+vite4+element-plus
 pinia状态管理
 mitt事件总线
