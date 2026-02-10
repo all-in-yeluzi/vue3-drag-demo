@@ -1,24 +1,35 @@
 <template>
   <table class="v-table">
+    <thead v-if="hasColumns">
+      <tr>
+        <th v-for="(col, index) in propValue.columns" :key="index" :class="{ bold: propValue.thBold }">{{ col.label }}</th>
+      </tr>
+    </thead>
     <tbody>
       <tr
         v-for="(item, index) in propValue.data"
         :key="index"
         :class="{
           stripe: propValue.stripe && Number(index) % 2,
-          bold: propValue.thBold && index === 0,
+          bold: !hasColumns && propValue.thBold && index === 0,
         }"
       >
-        <td v-for="(e, i) in item" :key="i">{{ e }}</td>
+        <template v-if="hasColumns">
+            <td v-for="(col, i) in propValue.columns" :key="i">{{ item[col.prop] }}</td>
+        </template>
+        <template v-else>
+            <td v-for="(e, i) in item" :key="i">{{ e }}</td>
+        </template>
       </tr>
     </tbody>
   </table>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import OnEvent from '../common/OnEvent.vue'
 
-defineProps({
+const props = defineProps({
   propValue: {
     type: Object,
     required: true,
@@ -28,6 +39,10 @@ defineProps({
     type: Object,
     default: () => ({}),
   },
+})
+
+const hasColumns = computed(() => {
+  return props.propValue.columns && props.propValue.columns.length > 0
 })
 </script>
 
@@ -40,7 +55,7 @@ defineProps({
   width: 100%;
   height: 100%;
 
-  td {
+  td, th {
     border: 1px solid #ccc;
     height: 10px;
   }

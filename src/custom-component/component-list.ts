@@ -46,6 +46,7 @@ const list = [
       time: 1000, // 定时更新时间
       paramType: '', // string object array
       requestCount: 0, // 请求次数限制，0 为无限
+      dataHandler: '', // 数据过滤处理脚本
     },
     style: {
       width: 200,
@@ -213,6 +214,7 @@ const list = [
         ['表头1', '表头2', '表头3'],
         ['内容1', '内容2', '内容3'],
       ],
+      columns: [], // { label: string, prop: string }[]
       stripe: true,
       thBold: true,
     },
@@ -224,6 +226,7 @@ const list = [
       time: 1000,
       paramType: '', // string object array
       requestCount: 0, // 请求次数限制，0 为无限
+      dataHandler: '', // 数据过滤处理脚本
     },
     style: {
       width: 600,
@@ -275,6 +278,16 @@ const list = [
         },
       },
     },
+    request: {
+      method: 'GET',
+      data: [],
+      url: '',
+      series: false,
+      time: 1000,
+      paramType: '',
+      requestCount: 0,
+      dataHandler: '',
+    },
     style: {
       width: 800,
       height: 500,
@@ -313,6 +326,16 @@ const list = [
           },
         ],
       },
+    },
+    request: {
+      method: 'GET',
+      data: [],
+      url: '',
+      series: false,
+      time: 1000,
+      paramType: '',
+      requestCount: 0,
+      dataHandler: '',
     },
     style: {
       width: 800,
@@ -362,6 +385,16 @@ const list = [
           },
         ],
       },
+    },
+    request: {
+      method: 'GET',
+      data: [],
+      url: '',
+      series: false,
+      time: 1000,
+      paramType: '',
+      requestCount: 0,
+      dataHandler: '',
     },
     style: {
       width: 600,

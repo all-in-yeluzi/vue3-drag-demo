@@ -34,6 +34,7 @@ import runAnimation from '@/utils/runAnimation'
 import { events } from '@/utils/events'
 import eventBus from '@/utils/eventBus'
 import OnEvent from '@/custom-component/common/OnEvent.vue'
+import dataManager from '@/utils/data-manager'
 
 const props = defineProps({
   config: {
@@ -48,6 +49,12 @@ const component = ref<any>(null)
 onMounted(() => {
   if (component.value) {
     runAnimation(component.value.$el, props.config.animations)
+  }
+
+  // 编辑器模式下请求数据，禁用定时器
+  // 使用 centralized DataManager，isEditor=true
+  if (props.config.request && props.config.request.url) {
+    dataManager.registerComponent(props.config, true)
   }
 })
 

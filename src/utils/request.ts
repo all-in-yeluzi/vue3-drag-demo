@@ -2,7 +2,7 @@ import { ElMessage } from 'element-plus'
 
 export const urlRE = /(https?):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/
 
-function request(options: any) {
+export function request(options: any) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest()
     xhr.timeout = 6000
@@ -10,6 +10,12 @@ function request(options: any) {
     let url = getURL(options.url)
     if (options.method === 'GET') {
       url += `${getURLParam(options.data)}`
+    }
+
+    // 开发环境使用通用代理解决跨域问题
+    // 注意：import.meta.env.DEV 是 Vite 提供的环境变量
+    if (import.meta.env.DEV && url.startsWith('http')) {
+      url = `/api-proxy?target=${encodeURIComponent(url)}`
     }
 
     xhr.open(options.method, url)

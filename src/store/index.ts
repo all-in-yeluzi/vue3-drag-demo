@@ -75,6 +75,56 @@ export const useMainStore = defineStore('main', {
     componentList: defaultList as Component[], // 组件库列表
   }),
   actions: {
+    // Global Component Data Update
+    updateComponentProps(id: string, path: string, value: any) {
+      const findAndSet = (list: Component[]) => {
+        for (const component of list) {
+          if (component.id === id) {
+            if (path.includes('.')) {
+              const paths = path.split('.')
+              let temp = component.propValue
+              // Special handling for VChart option and VTable data if needed, 
+              // but generic path support is better.
+              // Assuming path is relative to component.propValue or component itself?
+              // Let's stick to the previous logic: 
+              // If path is 'option' (for VChart), update component.propValue.option
+              // If path is 'data' (for VTable), update component.propValue.data
+              // If path is 'propValue', update component.propValue
+              
+              // However, to be generic, let's assume path is a key in component.propValue
+              // OR path is a direct key on component (less likely for data updates).
+              
+              // Let's implement a simple logic first matching the requirement:
+              if (component.component === 'VChart' && path === 'option') {
+                 component.propValue.option = value
+              } else if (component.component === 'VTable' && path === 'data') {
+                 component.propValue.data = value
+              } else {
+                 component.propValue = value
+              }
+            } else {
+               // Simple fallback
+               if (path === 'option' && component.propValue.option) {
+                   component.propValue.option = value
+               } else if (path === 'data' && component.propValue.data) {
+                   component.propValue.data = value
+               } else {
+                   component.propValue = value
+               }
+            }
+            return true
+          }
+          // Recursively check groups
+          if (component.component === 'Group' && component.propValue) {
+            if (findAndSet(component.propValue)) return true
+          }
+        }
+        return false
+      }
+      
+      findAndSet(this.componentData)
+    },
+
     // Component List Management
     setComponentList(list: Component[]) {
       this.componentList = list

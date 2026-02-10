@@ -1,5 +1,5 @@
 <template>
-  <el-collapse-item v-if="curComponent" title="数据来源（预览生效）" name="request" class="request-container">
+  <el-collapse-item v-if="curComponent" title="数据来源" name="request" class="request-container">
     <el-form v-if="request">
       <el-form-item label="请求地址">
         <el-input v-model.trim="request.url" @blur="validateURL">
@@ -43,6 +43,20 @@
           <el-input v-model="request.requestCount" type="number"></el-input>
         </template>
       </el-form-item>
+      <el-form-item label="数据过滤">
+        <el-tooltip content="编写JS代码处理数据，变量 data 为接口返回数据，需 return 处理后的结果。例如：return data.data" placement="top">
+             <i class="el-icon-info"></i>
+        </el-tooltip>
+        <el-input 
+          v-model="request.dataHandler" 
+          type="textarea" 
+          :rows="4" 
+          placeholder="function filter(data) { return data.data }"
+        ></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="fetchData">立即获取数据</el-button>
+      </el-form-item>
     </el-form>
   </el-collapse-item>
 </template>
@@ -51,6 +65,7 @@
 import { useMainStore } from '@/store'
 import { storeToRefs } from 'pinia'
 import { urlRE, getURL } from '@/utils/request'
+import dataManager from '@/utils/data-manager'
 import { ElMessage } from 'element-plus'
 
 const store = useMainStore()
@@ -88,6 +103,19 @@ const validateURL = () => {
   if ((url && /^\d+$/.test(url)) || !urlRE.test(getURL(url))) {
     ElMessage.error('请输入正确的 URL')
   }
+}
+
+const fetchData = async () => {
+  if (!request || !curComponent.value) return
+  
+  if (!request.url) {
+    ElMessage.error('请输入请求地址')
+    return
+  }
+
+  // 使用 DataManager 统一管理请求，支持数据过滤
+  await dataManager.fetchOne(curComponent.value)
+  ElMessage.success('请求发送成功')
 }
 </script>
 

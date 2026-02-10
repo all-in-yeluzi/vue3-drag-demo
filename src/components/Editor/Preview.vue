@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useMainStore } from '@/store'
 import { storeToRefs } from 'pinia'
 import { getCanvasStyle } from '@/utils/style'
@@ -26,6 +26,7 @@ import ComponentWrapper from './ComponentWrapper.vue'
 import { changeStyleWithScale } from '@/utils/translate'
 import { toPng } from 'html-to-image'
 import { deepCopy } from '@/utils/utils'
+import dataManager from '@/utils/data-manager'
 
 defineProps({
   isScreenshot: {
@@ -44,6 +45,15 @@ const container = ref<HTMLElement | null>(null)
 
 onMounted(() => {
   copyData.value = deepCopy(componentData.value)
+  
+  // 使用 centralized DataManager 注册组件请求
+  copyData.value.forEach((component) => {
+    dataManager.registerComponent(component, false)
+  })
+})
+
+onUnmounted(() => {
+  dataManager.clearAll()
 })
 
 const close = () => {
