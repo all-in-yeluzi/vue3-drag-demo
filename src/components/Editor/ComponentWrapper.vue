@@ -52,9 +52,9 @@ onMounted(() => {
   }
 
   // 编辑器模式下请求数据，禁用定时器
-  // 使用 centralized DataManager，isEditor=true
+  // 在预览模式下，ComponentWrapper 负责注册请求，允许定时器 (isEditor=false)
   if (props.config.request && props.config.request.url) {
-    dataManager.registerComponent(props.config, true)
+    dataManager.registerComponent(props.config, false)
   }
 })
 

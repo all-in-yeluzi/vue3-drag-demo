@@ -11,7 +11,7 @@
           height: changeStyleWithScale(canvasStyleData.height) + 'px',
         }"
       >
-        <ComponentWrapper v-for="(item, index) in copyData" :key="index" :config="item" />
+        <ComponentWrapper v-for="item in componentData" :key="item.id" :config="item" />
       </div>
     </div>
   </div>
@@ -40,16 +40,10 @@ const emit = defineEmits(['close'])
 const store = useMainStore()
 const { componentData, canvasStyleData } = storeToRefs(store)
 
-const copyData = ref<any[]>([])
 const container = ref<HTMLElement | null>(null)
 
 onMounted(() => {
-  copyData.value = deepCopy(componentData.value)
-  
-  // 使用 centralized DataManager 注册组件请求
-  copyData.value.forEach((component) => {
-    dataManager.registerComponent(component, false)
-  })
+  // 预览模式直接使用 store 数据，保持响应式，以便 DataManager 更新数据后组件能渲染
 })
 
 onUnmounted(() => {

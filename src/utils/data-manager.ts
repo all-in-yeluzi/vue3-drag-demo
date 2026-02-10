@@ -149,7 +149,16 @@ class DataManager {
       }
 
       if (component.component === 'VChart') {
-        path = 'option'
+        // 如果数据是数组，更新 data 字段（支持字段映射）
+        // 如果数据是对象且包含 series/xAxis，更新 option 字段（兼容旧模式）
+        if (Array.isArray(parsedData)) {
+          path = 'data'
+        } else if (parsedData && typeof parsedData === 'object' && ('series' in parsedData || 'xAxis' in parsedData)) {
+          path = 'option'
+        } else {
+          // 默认情况，如果无法识别，更新 data 尝试让组件处理
+          path = 'data'
+        }
       } else if (component.component === 'VTable') {
         path = 'data'
       }

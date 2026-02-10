@@ -1,6 +1,6 @@
 import { App, defineAsyncComponent } from 'vue'
 
-const components = ['CircleShape', 'Picture', 'VText', 'VButton', 'Group', 'RectShape', 'LineShape', 'VTable', 'VChart']
+const components = ['CircleShape', 'Picture', 'VText', 'VButton', 'Group', 'RectShape', 'LineShape', 'VTable', 'VChart', 'VMap', 'VOrnament']
 
 const svgs = ['SVGStar', 'SVGTriangle']
 

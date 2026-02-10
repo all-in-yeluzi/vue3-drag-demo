@@ -15,7 +15,7 @@
         <div v-for="(col, index) in curComponent.propValue.columns" :key="index" style="display: flex; margin-bottom: 5px;">
            <el-input v-model="col.label" placeholder="表头名" size="small" style="margin-right: 5px;"></el-input>
            <el-input v-model="col.prop" placeholder="字段Key" size="small" style="margin-right: 5px;"></el-input>
-           <el-button type="danger" circle size="small" @click="removeCol(index)">X</el-button>
+           <el-button type="danger" circle size="small" @click="removeCol(index as number)">X</el-button>
         </div>
         <el-button type="primary" size="small" @click="addCol">添加列</el-button>
       </el-form-item>
@@ -33,6 +33,7 @@ const store = useMainStore()
 const { curComponent } = storeToRefs(store)
 
 const addCol = () => {
+  if (!curComponent.value) return
   if (!curComponent.value.propValue.columns) {
     curComponent.value.propValue.columns = []
   }
@@ -40,6 +41,7 @@ const addCol = () => {
 }
 
 const removeCol = (index: number) => {
+  if (!curComponent.value) return
   curComponent.value.propValue.columns.splice(index, 1)
 }
 </script>

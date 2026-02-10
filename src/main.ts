@@ -18,5 +18,6 @@ const pinia = createPinia()
 app.use(pinia)
 app.use(router)
 app.use(ElementPlus, { size: 'small' })
+
 registerCustomComponents(app)
 app.mount('#app')

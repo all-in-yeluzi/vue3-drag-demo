@@ -56,13 +56,21 @@ import { ref, computed } from 'vue'
 import { useMainStore } from '@/store'
 import { storeToRefs } from 'pinia'
 import RealTimeComponentList from '@/components/RealTimeComponentList.vue'
-import { DataAnalysis, Grid, Star, Menu, PieChart, Collection } from '@element-plus/icons-vue'
+import { DataAnalysis, Grid, Star, Menu, PieChart, Collection, Platform, Box, MagicStick, Loading, Odometer, Share, TrendCharts, Reading, MapLocation } from '@element-plus/icons-vue'
 
 const store = useMainStore()
 const { componentList } = storeToRefs(store)
 
 const elIconMap: Record<string, any> = {
   'el-icon-data-analysis': DataAnalysis,
+  'el-icon-box': Box,
+  'el-icon-magic-stick': MagicStick,
+  'el-icon-loading': Loading,
+  'el-icon-odometer': Odometer,
+  'el-icon-share': Share,
+  'el-icon-trend-charts': TrendCharts,
+  'el-icon-reading': Reading,
+  'el-icon-map-location': MapLocation,
 }
 
 const categories = [
@@ -70,6 +78,7 @@ const categories = [
   { key: 'shape', label: '形状', icon: Star },
   { key: 'functional', label: '功能', icon: Menu },
   { key: 'chart', label: '图表', icon: PieChart },
+  { key: 'ornament', label: '装饰', icon: Platform },
   { key: 'layer', label: '图层', icon: Collection },
 ]
 
@@ -87,6 +96,11 @@ const subCategoryMap: Record<string, string> = {
   bar: '柱状图',
   line: '折线图',
   pie: '饼图',
+  map: '地图',
+  // DataV
+  border: '边框',
+  decoration: '装饰',
+  other: '其他',
 }
 
 const currentCategory = ref('base')

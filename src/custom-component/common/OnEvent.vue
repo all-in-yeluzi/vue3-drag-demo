@@ -1,3 +1,7 @@
+<template>
+  <div class="on-event-placeholder"></div>
+</template>
+
 <script lang="ts">
 import { defineComponent, onMounted, onBeforeUnmount } from 'vue'
 import eventBus from '@/utils/eventBus'
@@ -58,3 +62,9 @@ export default defineComponent({
   },
 })
 </script>
+
+<style scoped>
+.on-event-placeholder {
+  display: none;
+}
+</style>
